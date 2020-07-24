@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
+
+    <TextView
+        android:id="@+id/orientationLab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingRight="3dp"
+        android:text="@string/orientation"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Spinner
+        android:id="@+id/orientation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/orientationLab"
+        app:layout_constraintLeft_toRightOf="@id/orientationLab" />
+
+    <TextView
+        android:id="@+id/timeLab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingRight="3dp"
+        android:text="@string/time"
+        app:layout_constraintRight_toRightOf="@id/orientationLab"
+        app:layout_constraintTop_toBottomOf="@id/orientationLab" />
+
+    <EditText
+        android:id="@+id/time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:ems="10"
+        android:inputType="datetime"
+        app:layout_constraintBottom_toBottomOf="@id/timeLab"
+        app:layout_constraintLeft_toRightOf="@id/orientationLab" />
+
+    <TextView
+        android:id="@+id/gapLab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingRight="3dp"
+        android:text="@string/gap"
+        app:layout_constraintRight_toRightOf="@id/orientationLab"
+        app:layout_constraintTop_toBottomOf="@id/time" />
+
+    <EditText
+        android:id="@+id/gap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:ems="10"
+        android:focusable="false"
+        android:inputType="number"
+        app:layout_constraintBottom_toBottomOf="@id/gapLab"
+        app:layout_constraintLeft_toRightOf="@id/orientationLab" />
+
+    <TextView
+        android:id="@+id/sideLab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingRight="3dp"
+        android:text="@string/Side"
+        app:layout_constraintRight_toRightOf="@id/orientationLab"
+        app:layout_constraintTop_toBottomOf="@id/gap" />
+
+    <Spinner
+        android:id="@+id/side"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/sideLab"
+        app:layout_constraintLeft_toRightOf="@id/orientationLab" />
+
+    <TextView
+        android:id="@+id/systolicLab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingRight="3dp"
+        android:text="@string/systolic"
+        app:layout_constraintRight_toRightOf="@id/orientationLab"
+        app:layout_constraintTop_toBottomOf="@id/sideLab" />
+
+    <EditText
+        android:id="@+id/systolic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:ems="10"
+        android:inputType="number"
+        android:maxLength="3"
+        app:layout_constraintBottom_toBottomOf="@id/systolicLab"
+        app:layout_constraintLeft_toRightOf="@id/orientationLab" />
+
+    <TextView
+        android:id="@+id/diastolicLab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingRight="3dp"
+        android:text="@string/diastolic"
+        app:layout_constraintRight_toRightOf="@id/orientationLab"
+        app:layout_constraintTop_toBottomOf="@id/systolicLab" />
+
+    <EditText
+        android:id="@+id/diastolic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:ems="10"
+        android:inputType="number"
+        android:maxLength="3"
+        app:layout_constraintBottom_toBottomOf="@id/diastolicLab"
+        app:layout_constraintLeft_toRightOf="@id/orientationLab" />
+
+    <TextView
+        android:id="@+id/pulseLab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingRight="3dp"
+        android:text="@string/pulse"
+        app:layout_constraintRight_toRightOf="@id/orientationLab"
+        app:layout_constraintTop_toBottomOf="@id/diastolicLab" />
+
+    <EditText
+        android:id="@+id/pulse"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:ems="10"
+        android:inputType="number"
+        android:maxLength="3"
+        app:layout_constraintBottom_toBottomOf="@id/pulseLab"
+        app:layout_constraintLeft_toRightOf="@id/orientationLab" />
+
+    <Button
+        android:id="@+id/update"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Update"
+        app:layout_constraintRight_toLeftOf="@id/save"
+        app:layout_constraintTop_toBottomOf="@id/pulse" />
+
+    <Button
+        android:id="@+id/save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Save"
+        app:layout_constraintLeft_toLeftOf="@id/guideline"
+        app:layout_constraintRight_toRightOf="@id/guideline"
+        app:layout_constraintTop_toBottomOf="@id/pulse" />
+
+    <Button
+        android:id="@+id/cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cancel"
+        app:layout_constraintLeft_toRightOf="@id/save"
+        app:layout_constraintTop_toBottomOf="@id/pulse" />
+
+    <TableLayout
+        android:id="@+id/MeasurementsHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/save"></TableLayout>
+
+    <ScrollView
+        android:id="@+id/MeasuresBodyContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        android:layout_below="@id/MeasurementsHeader"
+        android:layout_marginTop="10dp"
+        android:scrollbars="vertical"
+        app:layout_constraintLeft_toLeftOf="@id/MeasurementsHeader"
+        app:layout_constraintRight_toRightOf="@id/MeasurementsHeader"
+        app:layout_constraintTop_toBottomOf="@id/MeasurementsHeader">
+
+        <TableLayout
+            android:id="@+id/MeasurementsBody"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"></TableLayout>
+    </ScrollView>
+
+    <Button
+        android:id="@+id/write"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:onClick="writeClicked"
+        android:text="Write"
+        app:layout_constraintRight_toLeftOf="@id/guideline"
+        app:layout_constraintTop_toBottomOf="@id/MeasuresBodyContainer" />
+
+    <Button
+        android:id="@+id/load"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:onClick="loadClicked"
+        android:text="Load"
+        app:layout_constraintLeft_toRightOf="@id/guideline"
+        app:layout_constraintTop_toBottomOf="@id/MeasuresBodyContainer" />
+    <CheckBox
+        android:id="@+id/fillScreen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Fill Screen"
+        android:onClick="fillScreenChecked"
+        app:layout_constraintLeft_toLeftOf="@id/guideline"
+        app:layout_constraintRight_toRightOf="@id/guideline"
+        app:layout_constraintTop_toBottomOf="@id/write" />
+
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/setdisplaysize"
+        app:layout_constraintLeft_toLeftOf="@id/guideline"
+        app:layout_constraintRight_toRightOf="@id/guideline"
+        app:layout_constraintTop_toBottomOf="@id/fillScreen">
+        <RadioButton android:id="@+id/radiomaxvalue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/MaxValue"
+            android:checked="true"
+            android:onClick="displayTextSizeOptionClicked"/>
+        <RadioButton android:id="@+id/radiomaxsize"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/MaxSize"
+            android:onClick="displayTextSizeOptionClicked"/>
+        <RadioButton android:id="@+id/radiomaxmeasure"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/MaxMeasure"
+            android:onClick="displayTextSizeOptionClicked"/>
+    </RadioGroup>>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

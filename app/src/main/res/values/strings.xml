@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">EnterMeasure</string>
+    <string name="systolic">Systolic</string>
+    <string name="diastolic">Diastolic</string>
+    <string name="pulse">Pulse</string>
+    <string name="orientation">Orientation</string>
+    <string name="time">Time</string>
+    <string name="gap">Gap</string>
+    <string name="Side">Side</string>
+    <string name="MaxValue">Max Value</string>
+    <string name="MaxSize">Max Size</string>
+    <string name="MaxMeasure">Max Measure</string>
+</resources>
