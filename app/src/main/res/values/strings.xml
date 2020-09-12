@@ -10,4 +10,15 @@
     <string name="MaxValue">Max Value</string>
     <string name="MaxSize">Max Size</string>
     <string name="MaxMeasure">Max Measure</string>
+    <string name="request">Request</string>
+    <string name="storagetype">Storage Type</string>
+    <string name="comment">Comment</string>
+    <string name="maxValue">Max Value</string>
+    <string name="maxSize">Max Size</string>
+    <string name="maxMeasure">Max Measure</string>
+    <string name="FileHandler">File Handler</string>
+    <string name="Size">Size</string>
+    <string name="Root" />
+    <string name="showRoots">Roots</string>
+    <string name="showDirectory">Directory</string>
 </resources>

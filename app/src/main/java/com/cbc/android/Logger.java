@@ -3,26 +3,35 @@ package com.cbc.android;
 import android.util.Log;
 
 public class Logger {
-    private String tag = "Not Set";
+  private String tag = "Not Set";
 
-    public static String lPad(String value, int length) {
-        while (value.length() < length) value = ' ' + value;
+  public static String lPad(String value, int length) {
+    while (value.length() < length) value = ' ' + value;
 
-        return value;
-    }
-    public static String rPad(String value, int length) {
-        while (value.length() < length) value += ' ';
+    return value;
+  }
+  public static String rPad(String value, int length) {
+    while (value.length() < length) value += ' ';
 
-        return value;
-    }
-    public static String lPad(int value, int length) {
-        return lPad(value + "", length);
-    }
+    return value;
+  }
+  public static String lPad(int value, int length) {
+    return lPad(value + "", length);
+  }
 
-    public Logger(String tag) {
-        this.tag = tag;
-    }
-    public void info(String message) {
-        Log.i(tag, message);
-    }
+  public Logger(String tag) {
+    this.tag = tag;
+  }
+  public void info(String message) {
+    Log.i(tag, message);
+  }
+  public void warning(String message) {
+    Log.w(tag, message);
+  }
+  public void error(String message) {
+    Log.e(tag, message);
+  }
+  public void error(String message, Exception exception) {
+    Log.e(tag, message, exception);
+  }
 }

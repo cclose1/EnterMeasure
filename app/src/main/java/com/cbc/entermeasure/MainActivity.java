@@ -1,39 +1,78 @@
 package com.cbc.entermeasure;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 
 import com.cbc.android.Alert;
 import com.cbc.android.EditTextHandler;
+import com.cbc.android.IntentHandler;
 import com.cbc.android.Logger;
 import com.cbc.android.ScrollableTable;
 import com.cbc.android.SpinnerHandler;
 import com.cbc.android.Table;
+import com.cbc.android.TextSizer;
 import com.cbc.android.Timer;
 
 import org.cbc.json.JSONException;
 import org.cbc.utils.system.DateFormatter;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        FileHandler.Request request = FileHandler.Request.valueOf(data.getStringExtra(FileHandler.REQUEST));
+        /*
+         * The requestCode should be the ordinal of the request enum. This is
+         * returned in the intent data
+         */
+        if (request.ordinal() != requestCode) {
+            logger.info("Request Code " + requestCode + " does not match ordinal for " + request.toString());
+            return;
+        }
+        if (resultCode == Activity.RESULT_OK) {
+            logger.info("Request succeeded");
+        } else {
+            logger.info("File Handler returned result code " + resultCode);
+            return;
+        }
+    }
+    private void startFileHandler(FileHandler.Request request, FileHandler.StorageType storageType) {
+        Intent intent = new Intent(this, FileHandler.class);
+        intent.setAction(request.toString());
+
+        if (storageType != null) {
+            intent.putExtra(FileHandler.STORAGE_TYPE, storageType.toString());
+        }
+        startActivityForResult(intent, request.ordinal());
+    }
+    public void testClicked(View view) {
+        startFileHandler(FileHandler.Request.GetPath, FileHandler.StorageType.Local);
+    }
+
     private enum ActionButtonName {Update, Save, Cancel}
 
     private class OnclickHandle implements View.OnClickListener {
@@ -57,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
             systolic.clear();
             diastolic.clear();
             pulse.clear();
+            comment.clear();
             time.clear();
             systolic.setFocus();
         }
@@ -85,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
             row.setCell("Systolic",      systolic.getInt());
             row.setCell("Diastolic",     diastolic.getInt());
             row.setCell("Pulse",         pulse.getInt());
+            row.setCell("Comment",       comment.getText());
         }
         private boolean update(boolean newRow) {
             if (!mandatoryPresent()) return false;
@@ -214,21 +255,10 @@ public class MainActivity extends AppCompatActivity {
             systolic.setText(row.getCell("Systolic").getValue());
             diastolic.setText(row.getCell("Diastolic").getValue());
             pulse.setText(row.getCell("Pulse").getValue());
+            comment.setText(row.getCell("Comment").getValue());
             time.setText(row.getCell("Time").getValue());
             systolic.setFocus();
             setActionKeys(true);
-        }
-    }
-    private class TextMeasurer implements Table.TextMeasurer {
-        private EditText measurer;
-
-        public TextMeasurer(float textSize) {
-            measurer = new EditText(MainActivity.this);
-            measurer.setTextSize(textSize);
-        }
-        @Override
-        public float getTextMeaure(String text) {
-            return measurer.getPaint().measureText(text);
         }
     }
     float textSize = 16f;
@@ -269,30 +299,32 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-    private SpinnerHandler         orientation   = null;
-    private SpinnerHandler         side          = null;
-    private EditTextHandler        systolic      = null;
-    private EditTextHandler        diastolic     = null;
-    private EditTextHandler        pulse         = null;
-    private EditTextHandler        time          = null;
-    private EditTextHandler        gap           = null;
-    private Alert                  alert         = null;
-    private GapUpdater             gapUpdater    = new GapUpdater();
-    private Timer                  gapTimer      = new Timer(gapUpdater);
-    private RowListener            rowListener   = new RowListener();
-    private DateFormatter          timeFormatter = new DateFormatter("yyyy-MM-dd HH:mm:ss", false);
-    private Logger                 logger        = new Logger("EnterMeasure");
-    private TextMeasurer           measurer;
-    private Table                  measures;
-    private ScrollableTable        measuresView;
+    private SpinnerHandler  orientation   = null;
+    private SpinnerHandler  side          = null;
+    private EditTextHandler systolic      = null;
+    private EditTextHandler diastolic     = null;
+    private EditTextHandler pulse         = null;
+    private EditTextHandler comment       = null;
+    private EditTextHandler time          = null;
+    private EditTextHandler gap           = null;
+    private Alert           alert         = null;
+    private GapUpdater      gapUpdater    = new GapUpdater();
+    private Timer           gapTimer      = new Timer(gapUpdater);
+    private RowListener     rowListener   = new RowListener();
+    private DateFormatter   timeFormatter = new DateFormatter("yyyy-MM-dd HH:mm:ss", false);
+    private Logger          logger        = new Logger("EnterMeasure");
+    private Table           measures;
+    private ScrollableTable measuresView;
 
     public void writeClicked(View view) {
         try {
             gapUpdater.endSession();
-            measures.save(getFilesDir(), "measures.txt");
+            measures.save(getFilesDir(), "measures.txt", true);
             /*
              * This seems to work but can't find the file in Device File Explorer.
              */
+            getApplicationContext().fileList();
+            File[] fs = getApplicationContext().getExternalFilesDirs(Environment.DIRECTORY_DOCUMENTS);
             measures.save(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "testext.txt");
         } catch (JSONException | FileNotFoundException e) {
             e.printStackTrace();
@@ -348,7 +380,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        TextWatcher tw = new TextWatcher() {
+        IntentHandler ih = new IntentHandler();
+        TextWatcher   tw = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 if (time.getText().length() == 0) {
@@ -357,28 +390,31 @@ public class MainActivity extends AppCompatActivity {
                     gapTimer.reset();
                 }
             }
-
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
             }
-
             @Override
             public void afterTextChanged(Editable s) {
             }
         };
+        logger.info("FilesDir " + getFilesDir() + " ExternalFilesDir " + getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS));
+
         action.setOnClickListener(R.id.update);
         action.setOnClickListener(R.id.save);
         action.setOnClickListener(R.id.cancel);
 
-        measurer = new TextMeasurer(textSize);
+        measuresView = new ScrollableTable(findViewById(R.id.save), 250);
+/*
         measuresView = new ScrollableTable(
-                (TableLayout) findViewById(R.id.MeasurementsHeader), (TableLayout) findViewById(R.id.MeasurementsBody));
+                            (TableLayout) findViewById(R.id.MeasurementsHeader),
+                            (TableLayout) findViewById(R.id.MeasurementsBody));
+
+ */
         measuresView.setRowListener(rowListener);
         measuresView.setLogger(logger);
         measures = new Table("Measures");
         measures.setLogger(logger);
-        measures.setTextMeasurer(measurer);
-        measuresView.setTextSize(textSize);
+        measures.setTextSizer(new TextSizer(this, textSize));
         measuresView.setFullScreenBorder(2);
         measures.addColumnHeader("Time");
         measures.addColumnHeader("Session Index", Table.ValueType.Int, false);;
@@ -387,21 +423,24 @@ public class MainActivity extends AppCompatActivity {
         measures.addColumnHeader("Systolic",      Table.ValueType.Int);
         measures.addColumnHeader("Diastolic",     Table.ValueType.Int);
         measures.addColumnHeader("Pulse",         Table.ValueType.Int);
+        measures.addColumnHeader("Comment",       Table.ValueType.String, false);
+
         alert       = new Alert(this);
         time        = new EditTextHandler(findViewById(R.id.time));
         gap         = new EditTextHandler(findViewById(R.id.gap));
         orientation = new SpinnerHandler(findViewById(R.id.orientation), "|Lying|Seated Horizontal|Seated Vertical|Standing Horizontal|Standing Vertical", "\\|");
         side        = new SpinnerHandler(findViewById(R.id.side),        "Left|Right", "\\|");
-        systolic    = new EditTextHandler(findViewById(R.id.systolic),   alert,"Systolic");
-        diastolic   = new EditTextHandler(findViewById(R.id.diastolic),  alert,"Diastolic");
-        pulse       = new EditTextHandler(findViewById(R.id.pulse),      alert,"Pulse");
+        systolic    = new EditTextHandler(findViewById(R.id.systolic),   alert, "Systolic");
+        diastolic   = new EditTextHandler(findViewById(R.id.diastolic),  alert, "Diastolic");
+        pulse       = new EditTextHandler(findViewById(R.id.pulse),      alert, "Pulse");
+        comment     = new EditTextHandler(findViewById(R.id.comment),    alert, "Comment");
 
         setTextSize(null, textSize);
         setScreenDisplay(false);
         systolic.setLister(tw);
         diastolic.setLister(tw);
-        pulse.setLister(tw);
         systolic.setFocus();
+        pulse.setLister(tw);
         gapTimer.start();
         setActionKeys(false);
     }

@@ -725,9 +725,10 @@ color abc_background_cache_hint_selector_material_light
 color abc_btn_colored_borderless_text_material
 color abc_btn_colored_text_material
 color abc_color_highlight_material
+color abc_decor_view_status_guard
+color abc_decor_view_status_guard_light
 color abc_hint_foreground_material_dark
 color abc_hint_foreground_material_light
-color abc_input_method_navigation_guard
 color abc_primary_text_disable_only_material_dark
 color abc_primary_text_disable_only_material_light
 color abc_primary_text_material_dark
@@ -746,6 +747,8 @@ color abc_tint_spinner
 color abc_tint_switch_track
 color accent_material_dark
 color accent_material_light
+color androidx_core_ripple_material_light
+color androidx_core_secondary_text_default_material_light
 color background_floating_material_dark
 color background_floating_material_light
 color background_material_dark
@@ -766,6 +769,7 @@ color checkbox_themeable_attribute_color
 color colorAccent
 color colorPrimary
 color colorPrimaryDark
+color colorYellow
 color design_bottom_navigation_shadow_color
 color design_box_stroke_color
 color design_dark_default_color_background
@@ -1363,6 +1367,7 @@ drawable mtrl_ic_error
 drawable mtrl_popupmenu_background
 drawable mtrl_popupmenu_background_dark
 drawable mtrl_tabs_default_indicator
+drawable mybutton
 drawable navigation_empty_icon
 drawable notification_action_background
 drawable notification_bg
@@ -1376,6 +1381,7 @@ drawable notification_template_icon_bg
 drawable notification_template_icon_low_bg
 drawable notification_tile_bg
 drawable notify_panel_notification_icon_bg
+drawable pengbrew
 drawable test_custom_background
 drawable tooltip_frame_dark
 drawable tooltip_frame_light
@@ -1466,10 +1472,14 @@ id checked
 id chip
 id chip_group
 id chronometer
+id cl
 id clear_text
 id clip_horizontal
 id clip_vertical
 id collapseActionView
+id comment
+id commentLab
+id complete
 id confirm_button
 id container
 id content
@@ -1501,6 +1511,7 @@ id exitUntilCollapsed
 id expand_activities_button
 id expanded_menu
 id fade
+id fhLayout
 id fill
 id fillScreen
 id fill_horizontal
@@ -1598,6 +1609,8 @@ id radio
 id radiomaxmeasure
 id radiomaxsize
 id radiomaxvalue
+id request
+id requestLab
 id right
 id right_icon
 id right_side
@@ -1625,10 +1638,13 @@ id search_voice_btn
 id select_dialog_listview
 id selected
 id setdisplaysize
+id setfilesoption
 id shortcut
 id showCustom
 id showHome
 id showTitle
+id showdirectory
+id showroots
 id side
 id sideLab
 id skipCollapsed
@@ -1647,6 +1663,8 @@ id src_in
 id src_over
 id standard
 id start
+id storageType
+id storageTypeLab
 id stretch
 id submenuarrow
 id submit_area
@@ -1661,6 +1679,7 @@ id tag_screen_reader_focusable
 id tag_transition_group
 id tag_unhandled_key_event_manager
 id tag_unhandled_key_listeners
+id test
 id test_checkbox_android_button_tint
 id test_checkbox_app_button_tint
 id text
@@ -1759,6 +1778,7 @@ layout abc_search_dropdown_item_icons_2line
 layout abc_search_view
 layout abc_select_dialog_material
 layout abc_tooltip
+layout activity_file_handler
 layout activity_main
 layout custom_dialog
 layout design_bottom_navigation_item
@@ -1829,10 +1849,13 @@ layout text_view_without_line_height
 mipmap ic_launcher
 mipmap ic_launcher_round
 plurals mtrl_badge_content_description
+string FileHandler
 string MaxMeasure
 string MaxSize
 string MaxValue
+string Root
 string Side
+string Size
 string abc_action_bar_home_description
 string abc_action_bar_up_description
 string abc_action_menu_overflow_description
@@ -1868,6 +1891,7 @@ string character_counter_overflowed_content_description
 string character_counter_pattern
 string chip_text
 string clear_text_end_icon_content_description
+string comment
 string diastolic
 string error_icon_content_description
 string exposed_dropdown_menu_content_description
@@ -1876,6 +1900,9 @@ string fab_transformation_sheet_behavior
 string gap
 string hide_bottom_view_on_scroll_behavior
 string icon_content_description
+string maxMeasure
+string maxSize
+string maxValue
 string mtrl_badge_numberless_content_description
 string mtrl_chip_close_icon_content_description
 string mtrl_exceed_max_badge_number_suffix
@@ -1917,10 +1944,15 @@ string path_password_eye_mask_strike_through
 string path_password_eye_mask_visible
 string path_password_strike_through
 string pulse
+string request
 string search_menu_title
+string showDirectory
+string showRoots
 string status_bar_notification_info_overflow
+string storagetype
 string systolic
 string time
+style ActionButton
 style AlertDialog_AppCompat
 style AlertDialog_AppCompat_Light
 style Animation_AppCompat_Dialog
@@ -1929,6 +1961,9 @@ style Animation_AppCompat_Tooltip
 style Animation_Design_BottomSheetDialog
 style Animation_MaterialComponents_BottomSheetDialog
 style AppTheme
+style AppTheme_AppBarOverlay
+style AppTheme_NoActionBar
+style AppTheme_PopupOverlay
 style Base_AlertDialog_AppCompat
 style Base_AlertDialog_AppCompat_Light
 style Base_Animation_AppCompat_Dialog
@@ -2306,6 +2341,7 @@ style Theme_AppCompat_Dialog
 style Theme_AppCompat_Dialog_Alert
 style Theme_AppCompat_Dialog_MinWidth
 style Theme_AppCompat_DialogWhenLarge
+style Theme_AppCompat_Empty
 style Theme_AppCompat_Light
 style Theme_AppCompat_Light_DarkActionBar
 style Theme_AppCompat_Light_Dialog

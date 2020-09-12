@@ -1,7 +1,10 @@
 package com.cbc.android;
 
+import android.content.Context;
+
 import org.cbc.json.JSONArray;
 import org.cbc.json.JSONException;
+import org.cbc.json.JSONFormat;
 import org.cbc.json.JSONObject;
 import org.cbc.json.JSONReader;
 import org.cbc.json.JSONType;
@@ -17,11 +20,9 @@ import java.util.Comparator;
 
 public class Table {
     public enum ValueType {Int, String};
-    public interface TextMeasurer {
-        public float getTextMeaure(String text);
-    }
-    private String   name;
-    private TextMeasurer measurer = null;
+    private String       name;
+    private boolean      statsUpToDate = true;
+    private TextSizer    measurer = null;
     private Logger log = new Logger(this.getClass().getSimpleName());
     public void setLogger(Logger logger) {
         log = logger;
@@ -55,7 +56,13 @@ public class Table {
             maxValueWidth  = 0;
             maxValue       = "";
         }
-        public void update(String text) {
+        public void update(String text, int maxColumnLength) {
+            if (text == null) return;
+            /*
+             * If text size is larger than maxColumnLength, truncate it to maxColumnLength.
+             */
+            if (maxColumnLength != 0 && text.length() > maxColumnLength) text = text.substring(0, maxColumnLength - 1);
+
             int size = text.length();
 
             totValueWidth += size;
@@ -67,7 +74,7 @@ public class Table {
                 maxValueWidth = size;
             }
             if (measurer != null) {
-                float pixels = measurer.getTextMeaure(text + ' '); //Add character to ensure a gap between columns
+                float pixels = measurer.getTextMeasure(text);
 
                 if (pixels > maxValuePixels) maxValuePixels = pixels;
 
@@ -97,11 +104,18 @@ public class Table {
      * Contains the fields that are common to header and row cells.
      */
     public abstract class Cell {
-        protected String           value;
-        protected ValueType        type;
-        protected int              width;
-        protected boolean          leftAlign;
-        protected boolean          display;
+        protected String    value;
+        protected ValueType type;
+        protected int       width;
+        protected int       maxLength;
+        protected boolean   leftAlign;
+        protected boolean   display;
+
+        public void setValue(String value) {
+            if (this.value != null && this.value.length() != 0 && !this.value.equals(value)) statsUpToDate = false;
+
+            this.value = value;
+        }
         public String getValue() {
             return value;
         }
@@ -110,6 +124,9 @@ public class Table {
         }
         public int getWidth() {
             return width;
+        }
+        public int getMaxLength() {
+            return maxLength;
         }
         public abstract String getName();
         public boolean getDisplay() {
@@ -129,12 +146,13 @@ public class Table {
         boolean display        = false;
         ColumnStatistics stats = new ColumnStatistics();
 
-        private HeaderCell(String name, ValueType type, boolean display) {
-            this.value   = name;
-            this.display = display;
-            this.width   = name.length();
-            this.type    = type;
-            stats.update(name);
+        private HeaderCell(String name, ValueType type, boolean display, int maxWidth) {
+            setValue(name);
+            this.display  = display;
+            this.width    = name.length();
+            this.type     = type;
+            this.maxLength = maxWidth;
+            stats.update(name, maxWidth);
         }
         public String getName() {
             return value;
@@ -144,6 +162,12 @@ public class Table {
         }
         public void setDisplay(boolean on) {
             display = on;
+        }
+        public void setMaxLength(int length) {
+            maxLength = length;
+        }
+        public int getMaxLength() {
+            return maxLength;
         }
     }
     /*
@@ -159,10 +183,12 @@ public class Table {
             header = headers.get(index);
         }
         private void setValue(String value, boolean leftAlign) {
-            this.value = value;
+            super.setValue(value);
+
+            if (value == null) return;
 
             header.leftAlign = leftAlign;
-            header.stats.update(value);
+            header.stats.update(value, header.getMaxLength());
 
             if (value.length() > header.width) header.width = value.length();
         }
@@ -171,6 +197,9 @@ public class Table {
         }
         public void setValue(int value) {
             setValue(Integer.toString(value), false);
+        }
+        public void setValue(long value) {
+            setValue(Long.toString(value), false);
         }
         public boolean getLeftAlign() {
             return header.leftAlign;
@@ -193,11 +222,18 @@ public class Table {
     /*
      * Returns the index in headers of the cell with name, or -1 if there is none.
      */
-    private int getColumnIndex(String name) {
+    private int getColumnIndex(String name, boolean mustExist) {
         for (int i = 0; i < headers.size(); i++) {
             if (headers.get(i).getName().equals(name)) return i;
         }
+        if (mustExist) throw new RuntimeException("Column " + name + " does not exists in table " + name);
         return -1;
+    }
+    /*
+     * Returns the index in headers of the cell with name, or -1 if there is none.
+     */
+    private int getColumnIndex(String name) {
+        return getColumnIndex(name, false);
     }
     /*
      * Defines a row in the table.
@@ -216,22 +252,20 @@ public class Table {
         protected void setCell(int column, int value) {
             columns.get(column).setValue(value);
         }
+        protected void setCell(int column, long value) {
+            columns.get(column).setValue(value);
+        }
         protected void setCell(int column, String value) {
             columns.get(column).setValue(value);
         }
         public void setCell(String column, String value) {
-            int i = getColumnIndex(column);
-
-            if (i == -1) throw new RuntimeException("Column " + name + " does not exists in table " + name);
-
-            setCell(i, value);
+            setCell(getColumnIndex(column, true), value);
         }
         public void setCell(String column, int value) {
-            int i = getColumnIndex(column);
-
-            if (i == -1) throw new RuntimeException("Column " + name + " does not exists in table " + name);
-
-            setCell(i, value);
+            setCell(getColumnIndex(column, true), value);
+        }
+        public void setCell(String column, long value) {
+            setCell(getColumnIndex(column, true), value);
         }
         public RowCell getCell(int index) {
             return columns.get(index);
@@ -243,11 +277,13 @@ public class Table {
     private ArrayList<Row> rows = new ArrayList<Row>();
 
     public void rebuildColumnStatistics() {
+        if (statsUpToDate) return;
+
         for (int i = 0; i < getColumnCount(); i++) {
             HeaderCell cell = (HeaderCell) headers.get(i);
 
             cell.stats.clear();
-            cell.stats.update(cell.value);
+            cell.stats.update(cell.value, cell.getMaxLength());
             cell.width = cell.value.length();
         }
         for (int i = 0; i < getRowCount(); i++) {
@@ -261,32 +297,57 @@ public class Table {
                 cell.setValue(cell.getValue(), cell.header.leftAlign);
             }
         }
+        log.info("Table " + name + " column statistics rebuilt");
+        statsUpToDate = true;
     }
     public Table(String name) {
         this.name    = name;
     }
+    public Table(String name, Context context) {
+        this(name);
+        setTextSizer(new TextSizer(context));
+    }
     public String getName() {
         return name;
     }
-    public void setTextMeasurer(TextMeasurer measurer) {
-        this.measurer = measurer;
+    public void setTextSizer(TextSizer sizer) {
+        this.measurer = sizer;
+    }
+    public TextSizer getTextSizer() {
+        return this.measurer;
     }
     public boolean pixelStatsAvailable() {
         return measurer != null;
     }
-    public void addColumnHeader(String name, ValueType type, boolean display) {
+    public void addColumnHeader(String name, ValueType type, boolean display, int maxWidth) {
         if (getColumnIndex(name) != -1) throw new RuntimeException("Column " + name + " already exists in table " + name);
 
-        headers.add(new HeaderCell(name, type, display));
+        headers.add(new HeaderCell(name, type, display, maxWidth));
+    }
+    public void addColumnHeader(String name, ValueType type, boolean display) {
+        addColumnHeader(name, ValueType.String, display, 0);
     }
     public void addColumnHeader(String name, boolean display) {
-        addColumnHeader(name, ValueType.String, display);
+        addColumnHeader(name, ValueType.String, display, 0);
     }
     public void addColumnHeader(String name, ValueType type) {
-        addColumnHeader(name, type, true);
+        addColumnHeader(name, type, true, 0);
     }
     public void addColumnHeader(String name) {
-        addColumnHeader(name, ValueType.String, true);
+        addColumnHeader(name, ValueType.String, true, 0);
+    }
+
+    public void setColumnVisible(int index, boolean yes) {
+        headers.get(index).setDisplay(yes);
+    }
+    public void setColumnVisible(String name, boolean yes) {
+        setColumnVisible(getColumnIndex(name, true), yes);
+    }
+    public void setMaxWidth(int index, int maxWidth) {
+        headers.get(index).setMaxLength(maxWidth);
+    }
+    public void setMaxWidth(String name, int maxWidth) {
+        setMaxWidth(getColumnIndex(name, true), maxWidth);
     }
     public int getColumnCount() {
         return headers.size();
@@ -307,7 +368,7 @@ public class Table {
     }
     public void removeRow(Table.Row row) {
         rows.remove(row);
-        rebuildColumnStatistics();
+        statsUpToDate = false;
     }
     public void addRow(Row row, boolean atStart) {
         if (atStart) rows.add(0, row); else rows.add(row);
@@ -320,6 +381,16 @@ public class Table {
     }
     public Row getRow(int index) {
         return rows.get(index);
+    }
+    public void removeRows() {
+        rows.clear();
+
+        for (int i = 0; i < getColumnCount(); i++) {
+            HeaderCell cell = (HeaderCell) headers.get(i);
+
+            cell.stats.clear();
+            cell.stats.update(cell.getName(), cell.getMaxLength());
+        }
     }
     public void loadJSON(JSONReader reader) throws JSONException {
         JSONValue root = JSONValue.load(reader);
@@ -340,7 +411,8 @@ public class Table {
             addColumnHeader(
                     col.get("Name").getString(),
                     ValueType.valueOf(col.get("Type").getString()),
-                    col.get("Display").getBoolean());
+                    col.get("Display").getBoolean(),
+                    0);
         }
         rows = root.getObject().get("Data", true).getArray();
 
@@ -405,11 +477,14 @@ public class Table {
         }
         return data;
     }
-    public void save(File path, String fileName) throws IOException, JSONException {
+    public void save(File path, String fileName, boolean format) throws IOException, JSONException {
         FileOutputStream str = new FileOutputStream(new File(path, fileName));
 
-        str.write(getJSON().toString().getBytes());
+        str.write(getJSON().toString(new JSONFormat(format)).getBytes());
         str.close();
+    }
+    public void save(File path, String fileName) throws IOException, JSONException {
+        save(path, fileName, false);
     }
     public void restore(File path, String fileName) throws FileNotFoundException, JSONException {
         loadJSON(new JSONReader(new File(path, fileName)));

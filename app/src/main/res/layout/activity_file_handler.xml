@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    android:id="@+id/fhLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".FileHandler">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
+
+    <TextView
+        android:id="@+id/requestLab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:paddingRight="3dp"
+        android:text="@string/request"
+        app:layout_constraintRight_toLeftOf="@id/guideline"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/request"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:ems="10"
+        android:inputType="datetime"
+        app:layout_constraintBottom_toBottomOf="@id/requestLab"
+        app:layout_constraintLeft_toRightOf="@id/guideline" />
+
+    <TextView
+        android:id="@+id/storageTypeLab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:paddingRight="3dp"
+        android:text="@string/storagetype"
+        app:layout_constraintRight_toLeftOf="@id/guideline"
+        app:layout_constraintTop_toBottomOf="@id/requestLab" />
+    <Spinner
+        android:id="@+id/storageType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/storageTypeLab"
+        app:layout_constraintLeft_toRightOf="@id/guideline" />
+    <RadioGroup
+        android:id="@+id/setfilesoption"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        app:layout_constraintLeft_toLeftOf="@id/guideline"
+        app:layout_constraintRight_toRightOf="@id/guideline"
+        app:layout_constraintTop_toBottomOf="@id/storageType">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:text="Show"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+        <RadioButton
+            android:id="@+id/showdirectory"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="radioOptionClicked"
+            android:checked="true"
+            android:text="@string/showDirectory" />
+        <RadioButton
+            android:id="@+id/showroots"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="radioOptionClicked"
+            android:text="@string/showRoots" />
+    </RadioGroup>
+    <Button
+        android:id="@+id/complete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:onClick="onComplete"
+        android:text="Complete"
+        app:layout_constraintLeft_toLeftOf="@id/guideline"
+        app:layout_constraintRight_toRightOf="@id/guideline"
+        app:layout_constraintTop_toBottomOf="@id/setfilesoption" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
