@@ -29,25 +29,70 @@ public class ScrollableTable {
 
     private class DisplayOptions {
         private TextSizer          sizer;
-        private DisplayWidthMode   mode              = DisplayWidthMode.OnOverflowFillScreen;
-        private int                screenPixelWidth  = Resources.getSystem().getDisplayMetrics().widthPixels;
-        private float              fullScreenBorder  = 0;
-        private float              columnGap         = 0;
-        private int                totalWidths       = 0;
-        private int                totalColumnPixels = 0;
-        private int                maxColumnNameSize = 0;
-        private ValuePixelSource   pixelSource       = ValuePixelSource.Value;
-        private ArrayList<Integer> columns = new ArrayList<Integer>();
+        private DisplayWidthMode   mode                = DisplayWidthMode.FillScreen;
+        private float              screenPixelWidth    = Resources.getSystem().getDisplayMetrics().widthPixels;
+        private float              fullScreenBorder    = 0;
+        private float              columnGap           = 0;
+        private int                totalLengths        = 0;
+        private float              totalColumnPixels   = 0;
+        private float              updatedColumnPixels = 0;
+        private float              totalMinPixels      = 0;
+        private float              reducablePixels     = 0;
+        private float              excessMinPixels     = 0;
+        private int                maxColumnNameSize   = 0;
+        private ValuePixelSource   pixelSource         = ValuePixelSource.Value;
+        private ArrayList<Field>   columns             = new ArrayList<>();
 
+        public class Field {
+            private float            width = -1;
+            private float            min   = -1;
+            private Table.HeaderCell header;
+
+            public Field(Table.HeaderCell cell) {
+                header = cell;
+
+                if (header.getDisplay()) {
+                    min             = getSourceMinWidth(header);
+                    totalMinPixels += min;
+                }
+            }
+            public void setWidth(float width) {
+                if (this.width < 0) {
+                    if (width < min)
+                        excessMinPixels += (min - width);
+                    else
+                        reducablePixels += (width - min);
+                }
+                this.width = width;
+            }
+            public float getWidth() {
+                return width;
+            }
+            public void applyMinWidth() {
+                if (width < min)
+                    width = min;
+                else
+                    width -= (width - min) * excessMinPixels / reducablePixels;
+                updatedColumnPixels += width;
+            }
+            public boolean isDisplayed() {
+                return header.getDisplay();
+            }
+        }
         public void clear() {
-            totalWidths       = 0;
-            totalColumnPixels = 0;
+            screenPixelWidth    = Resources.getSystem().getDisplayMetrics().widthPixels;
+            totalLengths        = 0;
+            totalColumnPixels   = 0;
+            totalMinPixels      = 0;
+            excessMinPixels     = 0;
+            reducablePixels     = 0;
+            updatedColumnPixels = 0;
             columns.clear();
         }
         public DisplayOptions() {
             this.sizer = new TextSizer(header.getContext());
-            setFullScreenBorder(3);
-            setColumnGap(3);
+            setFullScreenBorder(2);
+            setColumnGap(2);
         }
         public void setTextSize(float size) {
             sizer.setPixelSize(size);
@@ -65,85 +110,110 @@ public class ScrollableTable {
             columnGap = sizer.convertToPx(units, size);
         }
         public void setColumnGap(int size) {
-            columnGap = sizer.convertToPx(TypedValue.COMPLEX_UNIT_DIP, size);
+           setColumnGap(TypedValue.COMPLEX_UNIT_DIP, size);
         }
         public float getRatioSize(Table.Cell cell) {
-            return  (float)(screenPixelWidth - fullScreenBorder) / totalWidths * cell.getWidth();
+            return  (float)(screenPixelWidth) / totalLengths * cell.getLength();
         }
-        public float getValueSize(String value) {
+        public float getWidth(String value) {
             return sizer.getTextMeasure(value);
         }
-        public float getValueSize(int size) {
+        public float getWidth(int size) {
             String value = "";
 
             while (value.length() < size) value += 'a';
 
-            return getValueSize(value);
+            return getWidth(value);
         }
-        public float getValueSize(Table.HeaderCell cell) {
+        public float getSourceMinWidth(Table.HeaderCell cell) {
             float pixels = 0;
 
             switch (displayOptions.pixelSource) {
                 case Size:
-                    pixels = getValueSize(cell.stats.getMaxSize());
+                    pixels = getWidth(cell.getName().length());
                     break;
                 case Value:
-                    pixels = getValueSize(cell.stats.getMaxValue());
+                    pixels = getWidth(cell.getName());
+                    break;
+                case Measure:
+                    pixels = getWidth(cell.getName());
+            }
+            return pixels;
+        }
+        public float getSourceWidth(Table.HeaderCell cell) {
+            float pixels = 0;
+
+            switch (displayOptions.pixelSource) {
+                case Size:
+                    pixels = getWidth(cell.stats.getMaxSize());
+                    break;
+                case Value:
+                    pixels = getWidth(cell.stats.getMaxValue());
                     break;
                 case Measure:
                     if (cell.stats.pixelStatsAvailable())
                         pixels = cell.stats.getMaxValuePixels();
                     else
-                        pixels = getValueSize(cell.stats.getMaxValue());
+                        pixels = getWidth(cell.stats.getMaxValue());
             }
             return pixels;
         }
         public void addColumn(Table.HeaderCell col) {
+            columns.add(new Field(col));
+
             if (!col.getDisplay()) return;
-            totalWidths       += col.getWidth();
-            totalColumnPixels += getValueSize(col) + columnGap;
+
+            totalLengths      += col.getLength();
+            totalColumnPixels += getSourceWidth(col);
+            screenPixelWidth  -= columnGap;
 
             if (col.getName().length() > maxColumnNameSize) maxColumnNameSize = col.getName().length();
         }
-        public int getDisplayWidth(int colIndex) {
-            return columns.get(colIndex).intValue();
-        }
-        public void setDisplayWidth(TextView cell, int colIndex) {
-            int width = columns.get(colIndex).intValue();
+        public void setWidth(TextView cell, int colIndex) {
+            Field f  = columns.get(colIndex);
 
-            cell.setWidth(width);
+            if (!f.isDisplayed()) return;
+
+            cell.setWidth((int)f.getWidth());
 
             if (colIndex < columns.size()) cell.setPadding(0, 0, (int)columnGap, 0);
         }
-        public void initialise(Table table) {
+        public void initialise(Table table, boolean applyMinWidth) {
+            float width = 0;
+
             sizer = table.getTextSizer();
             clear();
+            screenPixelWidth -= fullScreenBorder;
             table.rebuildColumnStatistics();
 
             for (int i = 0; i < table.getColumnCount(); i++) {
                 addColumn(table.getColumn(i));
             }
             /*
-             * Remove final columnGap as there is no following column.
+             * Remove final columnGap as there is no following column. After this screenPixelWidth has
+             * been reduced to space available for column value, i.e. the gaps and border have been taken off.
              */
-            totalColumnPixels -= columnGap;
-            log.info("Table "              + table.getName()                 +
-                    " mode "               + mode.toString()                 +
-                    " pixel source "       + pixelSource.toString()          +
-                    " row width "          + displayOptions.totalWidths      +
-                    " screen pixel width " + displayOptions.screenPixelWidth +
-                    " columns pixel size " + displayOptions.totalColumnPixels);
+            screenPixelWidth += columnGap;
+            Logger.debug("Table "                    + table.getName()            +
+                         " mode "                    + mode.toString()            +
+                         " pixel source "            + pixelSource.toString()     + '\n'    +
+                         "Screen border "            + fullScreenBorder           +
+                         " row length "              + totalLengths               +
+                         " column gap "              + columnGap                  +
+                         " screen pixel width "      + Resources.getSystem().getDisplayMetrics().widthPixels + '\n' +
+                         "Available values pixels "  + screenPixelWidth  +
+                         " total min value pixels "  + totalMinPixels    +
+                         " columns pixel size "      + totalColumnPixels);
 
-            for (int i = 0; i < table.getColumnCount(); i++) {
-                Table.HeaderCell cell  = table.getColumn(i);
-                float            width = 0;
+            for (int i = 0; i < columns.size(); i++) {
+                Field            fld  = columns.get(i);
+                Table.HeaderCell cell = fld.header;
 
                 if (!cell.getDisplay()) {
                     /*
                      * Create an index entry for non displayed fields, so that the fields column index as
                      * index to columns.
                      */
-                    columns.add(new Integer(-1));
                     continue;
                 }
                 switch (mode) {
@@ -151,24 +221,32 @@ public class ScrollableTable {
                         width = getRatioSize(cell);
                         break;
                     case UseCalculated:
-                        width = getValueSize(cell);
+                        width = getSourceWidth(cell);
                         break;
                     case OnOverflowFillScreen:
                         if (totalColumnPixels > screenPixelWidth)
                             width = getRatioSize(cell);
                         else
-                            width = getValueSize(cell);
+                            width = getSourceWidth(cell);
                         break;
                 }
-                log.info("Column "            + Logger.rPad(cell.getName(), maxColumnNameSize) +
-                        " width "             + Logger.lPad(cell.getWidth(), 3) +
-                        " ratio pixels "      + Logger.lPad((int)getRatioSize(cell), 3) +
-                        " value size pixels " + Logger.lPad((int)getValueSize(cell.stats.getMaxSize()), 3) +
-                        " value pixels "      + Logger.lPad((int)getValueSize(cell.stats.maxValue), 3) +
-                        " measure pixels "    + Logger.lPad((int)cell.stats.maxValuePixels, 3) +
-                        " calculated pixels " + Logger.lPad((int)width, 3));
-
-                columns.add(new Integer((int)width));
+                Logger.debug("Column "             + Logger.rPad(cell.getName(), maxColumnNameSize) +
+                             " length "            + Logger.lPad(cell.getLength(), 3) +
+                             " min width "         + Logger.lPad((int)fld.min, 3) +
+                             " ratio pixels "      + Logger.lPad((int)getRatioSize(cell), 3) +
+                             " value size pixels " + Logger.lPad((int) getWidth(cell.stats.getMaxSize()), 3) +
+                             " value pixels "      + Logger.lPad((int) getWidth(cell.stats.maxValue), 3) +
+                             " measure pixels "    + Logger.lPad((int)cell.stats.maxValuePixels, 3) +
+                             " calculated pixels " + Logger.lPad((int)width, 3));
+                fld.setWidth(width);
+            }
+            Logger.debug("Excess min width pixels " + Logger.lPad((int)excessMinPixels, 3) +
+                        " reducable pixels "        + Logger.lPad((int)reducablePixels, 3));
+            if (applyMinWidth && excessMinPixels >= 0) {
+                for (Field f : columns) {
+                    f.applyMinWidth();
+                }
+                Logger.debug("Min width set. Field columns pixels " + updatedColumnPixels);
             }
         }
     }
@@ -182,6 +260,9 @@ public class ScrollableTable {
     }
     public void setFullScreenBorder(int units, int size) {
         displayOptions.setFullScreenBorder(units, size);
+    }
+    public void setColumnGap(int size) {
+        displayOptions.setColumnGap(size);
     }
     public void setDisplayOptionsMode(DisplayWidthMode mode) {
         displayOptions.mode = mode;
@@ -239,9 +320,10 @@ public class ScrollableTable {
         cs.applyTo(layout);
     }
     public ScrollableTable(TableLayout header, TableLayout body) {
-        this.header = header;
-        this.body   = body;
-        displayOptions = new DisplayOptions();
+        this.header     = header;
+        this.body       = body;
+        this.scrollView = (ScrollView) body.getParent();
+        displayOptions  = new DisplayOptions();
     }
     private TableRow createRow(TableLayout table, Object tag, boolean addListener) {
         TableRow row = new TableRow(header.getContext());
@@ -265,7 +347,7 @@ public class ScrollableTable {
 
         viewCell.measure(0, 0);
         viewCell.setGravity(cell.getLeftAlign()? Gravity.LEFT : Gravity.RIGHT);
-        displayOptions.setDisplayWidth(viewCell, columnIndex);
+        displayOptions.setWidth(viewCell, columnIndex);
 
         if (!cell.getDisplay()) viewCell.setVisibility(View.GONE);
 
@@ -282,13 +364,13 @@ public class ScrollableTable {
         rowListener = listener;
     }
 
-    public void loadTable(Table table)  {
+    public void loadTable(Table table, boolean setMinWidth)  {
         int i;
         int j;
         int columnCount = table.getColumnCount();
         TableRow    columns;
 
-        displayOptions.initialise(table);
+        displayOptions.initialise(table, setMinWidth);
         header.removeAllViews();
         body.removeAllViews();
         columns = createRow(header, null, false);
@@ -309,7 +391,78 @@ public class ScrollableTable {
             }
         }
     }
+    public void loadTable(Table table) {
+        loadTable(table, false);
+    }
+    private int getMaxRowHeight(View row) {
+        int height = row.getHeight();
+
+        if (height > 0) return height;
+
+        height = row.getMeasuredHeight();
+
+        if (height > 0) return height;
+
+        row.measure(0, 0);
+
+        return row.getMeasuredHeight();
+    }
+    public int getMaxRowHeight() {
+        int  height = 0;
+        int  min    = -1;
+        int  max    = 0;
+
+        for (int i = 0; i < body.getChildCount(); i++) {
+            height = getMaxRowHeight(body.getChildAt(i));
+
+            if (min < 0 || height < min) min = height;
+            if (height > max) max = height;
+        }
+        return max;
+    }
     public int getScrollId() {
         return scrollView.getId();
+    }
+    /*
+     * Calculates the maximum height that the scrollable table body can be set to and still have spaceAfter
+     * pixels for following fields to be displayed within the screen without scrolling.
+     *
+     * Note: The calculation only works if the software keyboard does not cover the start of the scrollable
+     *       table body
+     */
+    public int getMaxHeight(int spaceAfter, int maxRows) {
+        ScreenUtils.Position   pBody         = ScreenUtils.getPosition(scrollView);
+        int                    rowHeight     = getMaxRowHeight();
+        int                    rowBodyHeight = maxRows > 0? maxRows * rowHeight : 0;
+        int                    maxBodyHeight = 0;
+        int                    bodyHeight    = 0;
+
+
+        if (pBody.getY() == 0) return -1;
+
+        maxBodyHeight = DeviceDetails.getMetrics().heightPixels - pBody.getY() - spaceAfter;
+        bodyHeight    = rowBodyHeight > 0 && rowBodyHeight < maxBodyHeight? rowBodyHeight : maxBodyHeight;
+
+        Logger.debug(
+                   "Display height "   + DeviceDetails.getMetrics().heightPixels +
+                   " root height "     + ScreenUtils.getRoot(body).getHeight()   +
+                   " space after "     + spaceAfter    +
+                   " body start "      + pBody.getY()  +
+                   " rows "            + maxRows       +
+                   " row height "      + rowHeight     +
+                   " row body height " + rowBodyHeight +
+                   " max body height " + maxBodyHeight +
+                   " body height "     + bodyHeight + " pixels : " + TextSizer.getValue(bodyHeight, TextSizer.Units.DP) + " dp");
+        return bodyHeight;
+    }
+
+    public boolean setMaxHeight(int spaceAfter, int maxRows) {
+        int maxBodyHeight = getMaxHeight(spaceAfter, maxRows);
+
+        if (maxBodyHeight < 0) return false;
+
+        scrollView.getLayoutParams().height = maxBodyHeight;
+
+        return true;
     }
 }

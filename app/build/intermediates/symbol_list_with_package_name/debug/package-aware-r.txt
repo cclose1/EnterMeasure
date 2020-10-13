@@ -1485,10 +1485,14 @@ id container
 id content
 id contentPanel
 id coordinator
+id create
+id currentFile
+id currentFileLab
 id custom
 id customPanel
 id cut
 id date_picker_actions
+id debug
 id decor_content_parent
 id default_activity_button
 id design_bottom_sheet
@@ -1512,6 +1516,7 @@ id expand_activities_button
 id expanded_menu
 id fade
 id fhLayout
+id fileType
 id fill
 id fillScreen
 id fill_horizontal
@@ -1542,12 +1547,16 @@ id italic
 id item_touch_helper_previous_elevation
 id labeled
 id largeLabel
+id lcomplete
 id left
 id line1
 id line3
 id listMode
 id list_item
 id load
+id log
+id manageFields
+id manageFiles
 id masked
 id message
 id middle
@@ -1579,6 +1588,7 @@ id mtrl_picker_text_input_range_end
 id mtrl_picker_text_input_range_start
 id mtrl_picker_title_text
 id multiply
+id name
 id navigation_header_container
 id never
 id noScroll
@@ -1637,6 +1647,7 @@ id search_src_text
 id search_voice_btn
 id select_dialog_listview
 id selected
+id setDebug
 id setdisplaysize
 id setfilesoption
 id shortcut
@@ -1679,7 +1690,6 @@ id tag_screen_reader_focusable
 id tag_transition_group
 id tag_unhandled_key_event_manager
 id tag_unhandled_key_listeners
-id test
 id test_checkbox_android_button_tint
 id test_checkbox_app_button_tint
 id text

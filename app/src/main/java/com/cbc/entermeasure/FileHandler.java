@@ -1,19 +1,23 @@
 package com.cbc.entermeasure;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TableRow;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintSet;
 
+import com.cbc.android.Alert;
 import com.cbc.android.ConstraintLayoutHandler;
+import com.cbc.android.DeviceDetails;
 import com.cbc.android.EditTextHandler;
 import com.cbc.android.IntentHandler;
 import com.cbc.android.LabelledText;
@@ -22,6 +26,7 @@ import com.cbc.android.ScrollableTable;
 import com.cbc.android.SpinnerHandler;
 import com.cbc.android.Table;
 
+import org.cbc.filehandler.FileReader;
 import org.cbc.utils.system.DateFormatter;
 
 import java.io.File;
@@ -32,23 +37,28 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Random;
 
-public class FileHandler extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class FileHandler extends AppCompatActivity implements AdapterView.OnItemSelectedListener, View.OnClickListener {
     static public String REQUEST      = "com.cbc.entermeasure.request";
     static public String STORAGE_TYPE = "com.cbc.entermeasure.storagetype";
+    static public String SELECTED     = "com.cbc.entermeasure.selected";
 
-    public enum Request     {GetFile, GetPath}
+    public enum Request     {SelectFile, ManageFiles}
     public enum StorageType {Local, External}
+    public enum FileType    {File, Directory}
 
     private class Files {
-        private File        root      = null;
-        private File        directory = null;
-        private File[]      files     = null;
+        private File        root         = null;
+        private File        directory    = null;
+        private File[]      files        = null;
+
         private StorageType source    = StorageType.Local;
 
         private Map<StorageType, ArrayList<File>> roots = new HashMap<>();
 
+        private boolean same(File f1, File f2) {
+            return f1.getAbsolutePath().equals(f2.getAbsolutePath());
+        }
         private class DirectoryIterator implements Iterator<File> {
             int             count     = 0;
             boolean         canRemove = false;
@@ -108,7 +118,14 @@ public class FileHandler extends AppCompatActivity implements AdapterView.OnItem
                 dirs = new ArrayList<File>();
                 roots.put(type, dirs);
             }
-            if (root != null && !dirs.contains(root)) dirs.add(root);
+            if (root == null) return;
+
+            if (dirs.contains(root))
+                Logger.debug(type.toString() + " directory " + root.getAbsolutePath() + " already added");
+            else {
+                dirs.add(root);
+                Logger.debug(type.toString() + " directory " + root.getAbsolutePath() + " added");
+            }
         }
         /*
          * Adds roots to collection of roots.
@@ -118,11 +135,12 @@ public class FileHandler extends AppCompatActivity implements AdapterView.OnItem
 
             for (int i = 0; i < roots.length; i++) addRoot(type, roots[i]);
         }
-        public void loadFiles() throws IOException {
+        public void loadFiles() {
             files = directory.listFiles();
         }
         private void setDirectory(File directory) {
             this.directory = directory;
+            FileReader.DirectoryStats ds = FileReader.getDirectoryStats(directory);
             files = directory.listFiles();
         }
         private boolean setRoot(StorageType type, File root) throws IOException {
@@ -153,6 +171,26 @@ public class FileHandler extends AppCompatActivity implements AdapterView.OnItem
         public File getRoot() {
             return root;
         }
+        public String checkCanRemove(StorageType type, File file) {
+            if (file.isFile()) return "";
+
+            for (File f: roots.get(type)) {
+                if (same(f, file)) return "File " + file.getAbsolutePath() + " is a root directory";
+
+                if (f.getAbsolutePath().startsWith(file.getAbsolutePath() + "\\")) return "File " + file.getAbsolutePath() + " is parent of root " + f.getAbsolutePath();
+            }
+            return "";
+        }
+        public String checkCanRemove(File file) {
+            String result = checkCanRemove(StorageType.Local, file);
+
+            if (result.length() != 0) return result;
+
+            return checkCanRemove(StorageType.External, file);
+        }
+        public boolean canRemove(File file) {
+            return checkCanRemove(file).length() == 0;
+        }
         public File getDirectory() {
             return directory;
         }
@@ -167,18 +205,25 @@ public class FileHandler extends AppCompatActivity implements AdapterView.OnItem
             }
             return files;
         }
-        public void expand(String name) throws IOException {
+        public File getFullPath(String name, boolean mustExist) throws IOException {
             for (int i = 0; i < files.length; i++) {
                 File file = files[i];
 
-                if (file.getName().equals(name)) {
-                    if (!file.isDirectory()) throw new IOException(file.getAbsolutePath() + " is not a directory");
-
-                    setDirectory(file);
-                    return;
-                }
+                if (file.getName().equals(name)) return file;
             }
-            throw new IOException("Name " + name + " is not in directory " + directory.getAbsolutePath());
+            if (mustExist) throw new IOException("File " + name + " is not a directory " + directory.getAbsolutePath());
+
+            return null;
+        }
+        public File getFullPath(String name) throws IOException {
+            return getFullPath(name, true);
+        }
+        public void expand(String name) throws IOException {
+            File file = getFullPath(name);
+
+            if (!file.isDirectory()) throw new IOException(file.getAbsolutePath() + " is not a directory");
+
+            setDirectory(file);
         }
         public void up() throws IOException {
             if (root.equals(directory)) throw new IOException("Cannot go up from root directory");
@@ -186,15 +231,93 @@ public class FileHandler extends AppCompatActivity implements AdapterView.OnItem
             setDirectory(directory.getParentFile());
         }
         public String getRelativeDirectory() {
-            if (root == null || directory == null || root.getAbsolutePath().equals(directory.getAbsolutePath())) return "";
+            if (root == null || directory == null || same(root, directory)) return "";
 
             return directory.getAbsolutePath().substring(root.getAbsolutePath().length() + 1);
         }
+        public void remove(File file) throws IOException {
+            if (same(file, directory)) up();
+
+            file.delete();
+            loadFiles();
+            logger.info("Deleted file " + file.getAbsolutePath());
+        }
+        public void create(FileType type, String name) throws IOException {
+            File file = new File(directory, name);
+
+            if (file.exists()) throw new IOException(type.toString() + " " + name + " already exists in " + directory.toString());
+
+            switch (type) {
+                case File:
+                    file.createNewFile();
+                    break;
+                case Directory:
+                    file.mkdir();
+                    break;
+            }
+            loadFiles();
+        }
     }
+    private class FileDeleter implements DialogInterface.OnClickListener {
+        private Alert                     alert = null;
+        private File                      file  = null;
+        private FileReader.DirectoryStats stats = null;
+
+        private String tabs(int n) {
+            String t = "";
+
+            while (n-- > 0) t += '\t';
+
+            return t;
+        }
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            if (which == DialogInterface.BUTTON_POSITIVE) {
+                try {
+                    files.remove(file);
+                    displayFileDirectory();
+                } catch (Exception e) {
+                    logger.error("Dialogue failed on file deletion", e);
+                }
+            }
+            file = null;
+        }
+        public FileDeleter(Context context) {
+            alert = new Alert(context, this, true);
+        }
+        public void delete(File file) {
+            StringBuilder message = new StringBuilder();
+            String        title   = null;
+
+            this.file = file;
+
+            stats = FileReader.getDirectoryStats(file);
+
+            if (file.isDirectory()) {
+                title = "Delete Directory";
+                message.append("Name"        + tabs(6) + file.getName()         + '\n');
+                message.append("Depth"       + tabs(6) + stats.getDepth()       + '\n');
+                message.append("Files"       + tabs(7) + stats.getFiles()       + '\n');
+                message.append("Directories" + tabs(1) + stats.getDirectories() + '\n');
+                message.append("Files Size"  + tabs(3) + stats.getTotalFileSize());
+            } else {
+                title = "Delete File";
+                message.append("Name" + tabs(1) + file.getName() + '\n');
+                message.append("Size" + tabs(3) + stats.getTotalFileSize());
+            }
+            alert.display(title, message.toString());
+        }
+        public void delete(String file) {
+            delete(new File(file));
+        }
+    }
+    private Alert                   alert;
     private IntentHandler           intent;
     private Request                 request;
     private EditTextHandler         etRequest     = null;
+    private EditTextHandler         createName    = null;
     private SpinnerHandler          spStorageType = null;
+    private SpinnerHandler          spFileType    = null;
     private Logger                  logger        = new Logger("FileHandler");
     private Files                   files         = new Files();
     private DateFormatter           timeFormatter = new DateFormatter("yyyy-MM-dd HH:mm:ss", false);
@@ -206,10 +329,14 @@ public class FileHandler extends AppCompatActivity implements AdapterView.OnItem
     private LabelledText     fldDirectory   = null;
     private Button           fldUp          = null;
     private ButtonListener   buttonListener = new ButtonListener();
+    private FileDeleter      deleter        = null;
     private RadioGroup       show           = null;
+    private int              rootNameSize   = 39;
+    private int              dirNameSize    = 14;
 
     private void setTable(boolean directory) {
         filesTable.removeRows();
+        filesTable.setMaxLength("Name", directory? dirNameSize : rootNameSize);
         filesTable.setColumnVisible("Type",     directory);
         filesTable.setColumnVisible("Modified", directory);
         filesTable.setColumnVisible("Size",     directory);
@@ -234,18 +361,19 @@ public class FileHandler extends AppCompatActivity implements AdapterView.OnItem
             addRow(filesTable, it.next(), true);
         }
         fldRoot.setText(files.getRoot().getAbsolutePath());
-        filesView.loadTable(filesTable);
+        filesView.loadTable(filesTable, true);
     }
     private void displayFileDirectory() {
         String directory = files.getRelativeDirectory();
 
         setTable(true);
+        setScreen();
 
         for (Iterator<File> it = files.iterator(); it.hasNext(); ) {
             addRow(filesTable, it.next(), false);
         }
         fldRoot.setText(files.getRoot().getAbsolutePath());
-        filesView.loadTable(filesTable);
+        filesView.loadTable(filesTable, true);
         fldDirectory.setText(directory);
 
         if (directory.length() == 0) {
@@ -283,8 +411,7 @@ public class FileHandler extends AppCompatActivity implements AdapterView.OnItem
             displayRootDirectory();
     }
     @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        switch (parent.getId()) {
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) { switch (parent.getId()) {
             case R.id.storageType:
                 logger.info(
                         "StorageType selected position " + position     +
@@ -314,42 +441,99 @@ public class FileHandler extends AppCompatActivity implements AdapterView.OnItem
             }
         }
     }
+    private void debugLog() {
+        Logger log            = new Logger(null);
+        Logger.LogViews views = log.createLogViews();
+        Logger.logDisplayStats();
+        views.addAll("Content",    findViewById(android.R.id.content));
+        views.add("Main Layout",   findViewById(R.id.fhLayout));
+        views.add("Manage Fields", findViewById(R.id.manageFields));
+        views.add("Log",           findViewById(R.id.log));
+        views.log();
+    }
+    public void onClick(View view) {
+        int id = view.getId();
+
+        try {
+            if (id ==  R.id.log) {
+                debugLog();
+            } else if (id == fldDirectory.getText().getId()) {
+                String name  = fldDirectory.getValue();
+                File   file  = files.getDirectory();
+                String check = files.checkCanRemove(file);
+
+                if (check.length() != 0) {
+                    alert.display("Validation Failure", check);
+                    return;
+                }
+                if (!files.getRelativeDirectory().equals(name)) {
+                    /*
+                     * This an internal error.
+                     */
+                    logger.error("For delete directory, displayed directory " + name + " does not equal files directory " + files.getRelativeDirectory());
+                    return;
+                }
+                deleter.delete(file);
+            } else if (id == R.id.create) {
+                FileType ft = spFileType.getEnumSelected();
+
+                if (!createName.checkPresent()) return;
+
+                try {
+                    files.create(ft, createName.getText());
+                    displayFileDirectory();
+                } catch (IOException e) {
+                    alert.display("Error", e.toString());
+                }
+            } else
+                logger.warning("OnClick id " + view.getId() + " not expected");
+        } catch (Exception e) {
+            logger.error("On click for Id " + id, e);
+        }
+    }
     private class TableRowListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
             Table.Row row  = (Table.Row) view.getTag();
             String    file = row.getCell("Name").getValue();
 
-            if (isShowDirectory()) {
-                if (row.getCell("Type").getValue().equals("Dir")) {
-                    try {
+            try {
+                if (isShowDirectory()) {
+                    if (row.getCell("Type").getValue().equals("Dir")) {
                         files.expand(file);
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    } else {
+                        if (request == Request.SelectFile) {
+                            reply(files.getFullPath(file).getAbsolutePath());
+                        } else {
+                            deleter.delete(files.getFullPath(file));
+                        }
                     }
-                }
-            } else {
-                try {
+                } else {
                     files.setRoot(new File(file));
                     show.check(R.id.showdirectory);
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
+                displayFileDirectory();
+            } catch (IOException e) {
+                logger.error("Table row click ", e);
             }
-            displayFileDirectory();
         }
     }
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
         logger.info("StorageType onNothingSelected-parent " + parent.getClass().getName());
     }
-    public void onComplete(View view) throws Exception {
+    private void reply(String file) {
         Intent data = new Intent();
 
-        StorageType st = spStorageType.getEnumSelected();
         data.putExtra(FileHandler.REQUEST, request.toString());
+
+        if (file != null) data.putExtra(FileHandler.SELECTED, file);
+
         setResult(RESULT_OK, data);
         finish();
+    }
+    public void onComplete(View view) {
+        reply(null);
     }
     public void storageTypeClicked(View view) {
     }
@@ -373,23 +557,52 @@ public class FileHandler extends AppCompatActivity implements AdapterView.OnItem
                 logger.warning("Radio Group " + view.getId() + " not expected");
         }
     }
+    private void setScreen() {
+        int visible = etRequest.getText().equals("ManageFiles")? View.VISIBLE : View.GONE;
+
+        findViewById(R.id.create).setVisibility(visible);
+        findViewById(R.id.fileType).setVisibility(visible);
+        findViewById(R.id.name).setVisibility(visible);
+        findViewById(R.id.complete).setVisibility(visible);
+    }
+    @Override
+    public void onBackPressed() {
+        onComplete(null);
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            /*
+             * Make menu back arrow behave as Complete button;
+             */
+            case android.R.id.home:
+                onComplete(null);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_file_handler);
+        alert         = new Alert(this);
         etRequest     = new EditTextHandler(findViewById(R.id.request));
+        createName    = new EditTextHandler(findViewById(R.id.name), alert, "Create File");
         spStorageType = new SpinnerHandler(findViewById(R.id.storageType), StorageType.class);
+        spFileType    = new SpinnerHandler(findViewById(R.id.fileType),    FileType.class);
         intent        = new IntentHandler(getIntent());
         request       = intent.getEnumAction(Request.class);
         layout        = new ConstraintLayoutHandler(findViewById(R.id.fhLayout));
         show          = (RadioGroup) findViewById(R.id.setfilesoption);
-
+        deleter       = new FileDeleter(this);
         fldRoot       = new LabelledText(layout, "Root");
-        fldRoot.setConstraint(R.id.complete, ConstraintSet.LEFT, ConstraintSet.PARENT_ID);
+        fldRoot.setConstraint(R.id.setfilesoption, ConstraintSet.LEFT, ConstraintSet.PARENT_ID);
         fldRoot.setReadOnly(true);
+        fldRoot.setLines(1, 2);
         fldDirectory  = new LabelledText((ViewGroup) layout.getLayout(), "Directory");
         fldDirectory.setConstraint(fldRoot.getText().getId(), ConstraintSet.LEFT, ConstraintSet.PARENT_ID);
         fldDirectory.setReadOnly(true);
+        fldDirectory.getText().setOnClickListener((View.OnClickListener) this);
         fldUp         = (Button) layout.addView(new Button(this));
         fldUp.setText("Up");
         fldUp.setOnClickListener(buttonListener);
@@ -397,18 +610,23 @@ public class FileHandler extends AppCompatActivity implements AdapterView.OnItem
         filesTable    = new Table("Files", this);
         etRequest.setText(request.toString());
 
-        layout.connect(fldUp, ConstraintSet.LEFT,  R.id.guideline,          ConstraintSet.LEFT);
-        layout.connect(fldUp, ConstraintSet.RIGHT, R.id.guideline,          ConstraintSet.RIGHT);
-        layout.connect(fldUp, ConstraintSet.TOP,   filesView.getScrollId(), ConstraintSet.BOTTOM, 10);
+        layout.connect(fldUp,             ConstraintSet.LEFT,  R.id.guideline,          ConstraintSet.LEFT);
+        layout.connect(fldUp,             ConstraintSet.RIGHT, R.id.guideline,          ConstraintSet.RIGHT);
+        layout.connect(fldUp,             ConstraintSet.TOP,   filesView.getScrollId(), ConstraintSet.BOTTOM, 10);
+        layout.connect(R.id.manageFields, ConstraintSet.TOP,   fldUp.getId(),           ConstraintSet.BOTTOM);
+
         layout.apply();
 
-        filesTable.addColumnHeader("Name",     Table.ValueType.String, true, 30);
+        filesTable.addColumnHeader("Name",     Table.ValueType.String, true, dirNameSize);
         filesTable.addColumnHeader("Type",     true);
         filesTable.addColumnHeader("Write",    true);
         filesTable.addColumnHeader("Modified", true);
         filesTable.addColumnHeader("Count",    Table.ValueType.Int);
         filesTable.addColumnHeader("Size",     Table.ValueType.Int);
         filesView.setValuePixelSource(ScrollableTable.ValuePixelSource.Measure);
+        filesView.setDisplayOptionsMode(ScrollableTable.DisplayWidthMode.OnOverflowFillScreen);
+        filesView.setFullScreenBorder(0);
+        filesView.setColumnGap(1);
         filesView.setRowListener(new TableRowListener());
         spStorageType.getSpinner().setOnItemSelectedListener(this);
         logDir("DataDir",           getDataDir());
@@ -427,7 +645,17 @@ public class FileHandler extends AppCompatActivity implements AdapterView.OnItem
         files.addRoots(StorageType.External, getExternalMediaDirs());
         files.addRoots(StorageType.External, getExternalCacheDirs());
         files.addRoots(StorageType.External, getExternalFilesDirs(null));
-
+        setScreen();
+        /*
+         * Following is to stop the soft keyboard popping up and behave like a numeric keyboard when
+         * using the emulator, i.e. uses development device keyboard.
+         *
+         * Setting input type in xml to textNosuggestions is not sufficient.
+         */
+        if (DeviceDetails.isEmulator()) {
+            createName.getEditText().setShowSoftInputOnFocus(false);
+            createName.getEditText().setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+        }
         try {
             files.setRoot(StorageType.Local);
             displayFileDirectory();

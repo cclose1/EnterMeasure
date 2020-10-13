@@ -106,7 +106,7 @@ public class Table {
     public abstract class Cell {
         protected String    value;
         protected ValueType type;
-        protected int       width;
+        protected int       length;
         protected int       maxLength;
         protected boolean   leftAlign;
         protected boolean   display;
@@ -122,8 +122,11 @@ public class Table {
         public boolean getLeftAlign() {
             return leftAlign;
         }
-        public int getWidth() {
-            return width;
+        public int getLength() {
+            return length;
+        }
+        protected void setMaxLength(int maxLength) {
+            this.maxLength = maxLength;
         }
         public int getMaxLength() {
             return maxLength;
@@ -146,13 +149,13 @@ public class Table {
         boolean display        = false;
         ColumnStatistics stats = new ColumnStatistics();
 
-        private HeaderCell(String name, ValueType type, boolean display, int maxWidth) {
+        private HeaderCell(String name, ValueType type, boolean display, int maxLength) {
             setValue(name);
             this.display  = display;
-            this.width    = name.length();
+            this.length = name.length();
             this.type     = type;
-            this.maxLength = maxWidth;
-            stats.update(name, maxWidth);
+            this.maxLength = maxLength;
+            stats.update(name, maxLength);
         }
         public String getName() {
             return value;
@@ -163,11 +166,11 @@ public class Table {
         public void setDisplay(boolean on) {
             display = on;
         }
-        public void setMaxLength(int length) {
-            maxLength = length;
+        public void setMaxLength(int maxLength) {
+            super.setMaxLength(maxLength);
         }
         public int getMaxLength() {
-            return maxLength;
+            return super.getMaxLength();
         }
     }
     /*
@@ -190,7 +193,7 @@ public class Table {
             header.leftAlign = leftAlign;
             header.stats.update(value, header.getMaxLength());
 
-            if (value.length() > header.width) header.width = value.length();
+            if (value.length() > header.length) header.length = value.length();
         }
         public void setValue(String value) {
             setValue(value, true);
@@ -207,8 +210,8 @@ public class Table {
         public boolean getDisplay() {
             return header.display;
         }
-        public int getWidth() {
-            return header.width;
+        public int getLength() {
+            return header.length;
         }
         public ValueType getValueType() {
             return header.type;
@@ -276,16 +279,21 @@ public class Table {
     }
     private ArrayList<Row> rows = new ArrayList<Row>();
 
-    public void rebuildColumnStatistics() {
-        if (statsUpToDate) return;
-
+    private void resetHeaders() {
         for (int i = 0; i < getColumnCount(); i++) {
             HeaderCell cell = (HeaderCell) headers.get(i);
 
+            cell.length = cell.value.length();
             cell.stats.clear();
             cell.stats.update(cell.value, cell.getMaxLength());
-            cell.width = cell.value.length();
         }
+
+    }
+    public void rebuildColumnStatistics() {
+        if (statsUpToDate) return;
+
+        resetHeaders();
+
         for (int i = 0; i < getRowCount(); i++) {
             Row row = rows.get(i);
 
@@ -319,10 +327,10 @@ public class Table {
     public boolean pixelStatsAvailable() {
         return measurer != null;
     }
-    public void addColumnHeader(String name, ValueType type, boolean display, int maxWidth) {
+    public void addColumnHeader(String name, ValueType type, boolean display, int maxLength) {
         if (getColumnIndex(name) != -1) throw new RuntimeException("Column " + name + " already exists in table " + name);
 
-        headers.add(new HeaderCell(name, type, display, maxWidth));
+        headers.add(new HeaderCell(name, type, display, maxLength));
     }
     public void addColumnHeader(String name, ValueType type, boolean display) {
         addColumnHeader(name, ValueType.String, display, 0);
@@ -343,11 +351,11 @@ public class Table {
     public void setColumnVisible(String name, boolean yes) {
         setColumnVisible(getColumnIndex(name, true), yes);
     }
-    public void setMaxWidth(int index, int maxWidth) {
-        headers.get(index).setMaxLength(maxWidth);
+    public void setMaxLength(int index, int maxLength) {
+        headers.get(index).setMaxLength(maxLength);
     }
-    public void setMaxWidth(String name, int maxWidth) {
-        setMaxWidth(getColumnIndex(name, true), maxWidth);
+    public void setMaxLength(String name, int maxLength) {
+        setMaxLength(getColumnIndex(name, true), maxLength);
     }
     public int getColumnCount() {
         return headers.size();
@@ -384,13 +392,7 @@ public class Table {
     }
     public void removeRows() {
         rows.clear();
-
-        for (int i = 0; i < getColumnCount(); i++) {
-            HeaderCell cell = (HeaderCell) headers.get(i);
-
-            cell.stats.clear();
-            cell.stats.update(cell.getName(), cell.getMaxLength());
-        }
+        resetHeaders();
     }
     public void loadJSON(JSONReader reader) throws JSONException {
         JSONValue root = JSONValue.load(reader);
@@ -457,7 +459,7 @@ public class Table {
             col = row.addObject();
             col.add("Name",      new JSONValue(cell.getName()));
             col.add("Type",      new JSONValue(cell.type.toString()));
-            col.add("Precision", new JSONValue(cell.width));
+            col.add("Precision", new JSONValue(cell.length));
             col.add("Display",   new JSONValue(cell.display));
         }
         row = data.add("Data", (JSONArray)null);
@@ -477,16 +479,22 @@ public class Table {
         }
         return data;
     }
-    public void save(File path, String fileName, boolean format) throws IOException, JSONException {
-        FileOutputStream str = new FileOutputStream(new File(path, fileName));
+    public void save(File file, boolean format) throws IOException, JSONException {
+        FileOutputStream str = new FileOutputStream(file);
 
         str.write(getJSON().toString(new JSONFormat(format)).getBytes());
         str.close();
     }
+    public void save(File path, String fileName, boolean format) throws IOException, JSONException {
+        save(new File(path, fileName), format);
+    }
     public void save(File path, String fileName) throws IOException, JSONException {
-        save(path, fileName, false);
+        save(new File(path, fileName), false);
+    }
+    public void restore(File file) throws FileNotFoundException, JSONException {
+        loadJSON(new JSONReader(file));
     }
     public void restore(File path, String fileName) throws FileNotFoundException, JSONException {
-        loadJSON(new JSONReader(new File(path, fileName)));
+        restore(new File(path, fileName));
     }
 }

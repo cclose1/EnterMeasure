@@ -24,4 +24,15 @@ public class EnumUtils<T extends Enum<T>> {
     public String toString(T value) {
         return value.toString();
     }
+
+    public int maxWidth() {
+        int max = 0;
+
+        for (Object enumVal: enumType.getEnumConstants()) {
+            int len = enumVal.toString().length();
+
+            if (len > max) max = len;
+        }
+        return max;
+    }
 }

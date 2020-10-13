@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
@@ -7,10 +9,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cl"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         tools:context=".MainActivity">
 
         <androidx.constraintlayout.widget.Guideline
@@ -55,12 +55,16 @@
             app:layout_constraintBottom_toBottomOf="@id/timeLab"
             app:layout_constraintLeft_toRightOf="@id/orientationLab" />
 
+<!-- The label fields that have onClick and focusable have them for debug purposes. They turn on and off certain debug options.
+-->
         <TextView
             android:id="@+id/gapLab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingRight="3dp"
             android:text="@string/gap"
+            android:onClick="onClick"
+            android:focusable="false"
             app:layout_constraintRight_toRightOf="@id/orientationLab"
             app:layout_constraintTop_toBottomOf="@id/time" />
 
@@ -81,6 +85,8 @@
             android:layout_height="wrap_content"
             android:paddingRight="3dp"
             android:text="@string/Side"
+            android:onClick="onClick"
+            android:focusable="false"
             app:layout_constraintRight_toRightOf="@id/orientationLab"
             app:layout_constraintTop_toBottomOf="@id/gap" />
 
@@ -97,6 +103,8 @@
             android:layout_height="wrap_content"
             android:paddingRight="3dp"
             android:text="@string/systolic"
+            android:onClick="onClick"
+            android:focusable="false"
             app:layout_constraintRight_toRightOf="@id/orientationLab"
             app:layout_constraintTop_toBottomOf="@id/sideLab" />
 
@@ -117,6 +125,8 @@
             android:layout_height="wrap_content"
             android:paddingRight="3dp"
             android:text="@string/diastolic"
+            android:onClick="onClick"
+            android:focusable="false"
             app:layout_constraintRight_toRightOf="@id/orientationLab"
             app:layout_constraintTop_toBottomOf="@id/systolicLab" />
 
@@ -168,15 +178,38 @@
             android:ems="10"
             android:inputType="text"
             android:maxLength="80"
-            app:layout_constraintBottom_toBottomOf="@id/commentLab"
-            app:layout_constraintLeft_toRightOf="@id/orientationLab" />
+            app:layout_constraintLeft_toRightOf="@id/orientationLab"
+            app:layout_constraintTop_toTopOf="@id/commentLab" />
+
+        <TextView
+            android:id="@+id/currentFileLab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="3dp"
+            android:text="Current File"
+            app:layout_constraintRight_toRightOf="@id/orientationLab"
+            app:layout_constraintTop_toBottomOf="@id/commentLab" />
+
+        <EditText
+            android:id="@+id/currentFile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:width="300dp"
+            android:background="@android:color/transparent"
+            android:ems="10"
+            android:inputType="textMultiLine"
+            android:maxLines="2"
+            android:minLines="1"
+            android:onClick="onClick"
+            app:layout_constraintLeft_toRightOf="@id/orientationLab"
+            app:layout_constraintTop_toTopOf="@id/currentFileLab" />
 
         <Button
             android:id="@+id/update"
             style="@style/ActionButton"
             android:text="Update"
             app:layout_constraintRight_toLeftOf="@id/save"
-            app:layout_constraintTop_toBottomOf="@id/comment" />
+            app:layout_constraintTop_toBottomOf="@id/currentFile" />
 
         <Button
             android:id="@+id/save"
@@ -184,14 +217,14 @@
             android:text="Save"
             app:layout_constraintLeft_toLeftOf="@id/guideline"
             app:layout_constraintRight_toRightOf="@id/guideline"
-            app:layout_constraintTop_toBottomOf="@id/comment" />
+            app:layout_constraintTop_toBottomOf="@id/currentFile" />
 
         <Button
             android:id="@+id/cancel"
             style="@style/ActionButton"
             android:text="Cancel"
             app:layout_constraintLeft_toRightOf="@id/save"
-            app:layout_constraintTop_toBottomOf="@id/comment" />
+            app:layout_constraintTop_toBottomOf="@id/currentFile" />
 
         <TableLayout
             android:id="@+id/MeasurementsHeader"
@@ -205,8 +238,9 @@
         <ScrollView
             android:id="@+id/MeasuresBodyContainer"
             android:layout_width="wrap_content"
-            android:layout_height="100dp"
+            android:layout_height="0dp"
             android:layout_marginTop="10dp"
+            android:fillViewport="true"
             android:scrollbars="vertical"
             app:layout_constraintLeft_toLeftOf="@id/MeasurementsHeader"
             app:layout_constraintRight_toRightOf="@id/MeasurementsHeader"
@@ -222,71 +256,104 @@
             android:id="@+id/write"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
             android:onClick="writeClicked"
             android:text="Write"
+            android:textAllCaps="false"
             app:layout_constraintRight_toLeftOf="@id/guideline"
-            app:layout_constraintTop_toBottomOf="@id/MeasuresBodyContainer" />
+            app:layout_constraintTop_toBottomOf="@id/MeasuresBodyContainer"
+            app:layout_constraintBottom_toTopOf="@id/manageFiles" />
 
         <Button
             android:id="@+id/load"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
             android:onClick="loadClicked"
             android:text="Load"
+            android:textAllCaps="false"
             app:layout_constraintLeft_toRightOf="@id/guideline"
-            app:layout_constraintTop_toBottomOf="@id/MeasuresBodyContainer" />
+            app:layout_constraintTop_toBottomOf="@id/MeasuresBodyContainer"
+            app:layout_constraintBottom_toTopOf="@id/manageFiles" />
+
+        <Button
+            android:id="@+id/manageFiles"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:onClick="onClick"
+            android:text="Manage Files"
+            android:textAllCaps="false"
+            app:layout_constraintLeft_toLeftOf="@id/guideline"
+            app:layout_constraintRight_toRightOf="@id/guideline"
+            app:layout_constraintBottom_toTopOf="@id/setDebug" />
 
         <CheckBox
-            android:id="@+id/fillScreen"
+            android:id="@+id/setDebug"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="fillScreenChecked"
-            android:text="Fill Screen"
+            android:onClick="onClick"
+            android:text="Set Debug"
             app:layout_constraintLeft_toLeftOf="@id/guideline"
             app:layout_constraintRight_toRightOf="@id/guideline"
-            app:layout_constraintTop_toBottomOf="@id/write" />
+            app:layout_constraintBottom_toTopOf="@id/debug" />
 
-        <RadioGroup
-            android:id="@+id/setdisplaysize"
+        <LinearLayout
+            android:id="@+id/debug"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
             app:layout_constraintLeft_toLeftOf="@id/guideline"
             app:layout_constraintRight_toRightOf="@id/guideline"
-            app:layout_constraintTop_toBottomOf="@id/fillScreen">
+            app:layout_constraintBottom_toBottomOf="parent">
 
-            <RadioButton
-                android:id="@+id/radiomaxvalue"
+            <CheckBox
+                android:id="@+id/fillScreen"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checked="true"
-                android:onClick="displayTextSizeOptionClicked"
-                android:text="@string/maxValue" />
+                android:onClick="fillScreenChecked"
+                android:text="Fill Screen" />
 
-            <RadioButton
-                android:id="@+id/radiomaxsize"
+            <RadioGroup
+                android:id="@+id/setdisplaysize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <RadioButton
+                    android:id="@+id/radiomaxvalue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:onClick="displayTextSizeOptionClicked"
+                    android:text="@string/maxValue" />
+
+                <RadioButton
+                    android:id="@+id/radiomaxsize"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="displayTextSizeOptionClicked"
+                    android:text="@string/maxSize" />
+
+                <RadioButton
+                    android:id="@+id/radiomaxmeasure"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="displayTextSizeOptionClicked"
+                    android:text="@string/maxMeasure" />
+            </RadioGroup>
+
+            <Button
+                android:id="@+id/log"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="displayTextSizeOptionClicked"
-                android:text="@string/maxSize" />
-
-            <RadioButton
-                android:id="@+id/radiomaxmeasure"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="displayTextSizeOptionClicked"
-                android:text="@string/maxMeasure" />
-        </RadioGroup>
-        <Button
-            android:id="@+id/test"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:onClick="testClicked"
-            android:text="Test"
-            app:layout_constraintLeft_toLeftOf="@id/guideline"
-            app:layout_constraintRight_toRightOf="@id/guideline"
-            app:layout_constraintTop_toBottomOf="@id/setdisplaysize" />
+                android:layout_marginTop="8dp"
+                android:onClick="onClick"
+                android:textAllCaps="false"
+                android:text="Log" />
+        </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

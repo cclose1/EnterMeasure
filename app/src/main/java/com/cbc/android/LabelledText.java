@@ -3,7 +3,6 @@ package com.cbc.android;
 import android.content.Context;
 import android.text.InputType;
 import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -36,13 +35,11 @@ public class LabelledText {
         this.label = (TextView) add(new TextView(context));
         this.text  = (EditText) add(new EditText(context));
         this.label.setText(label);
-        this.label.setGravity(Gravity.CENTER_HORIZONTAL);
         this.label.setTextSize(sizer.getPixelSize());
         this.text.setBackground(null);
         this.text.setInputType(InputType.TYPE_CLASS_TEXT);
         this.text.setTextSize(sizer.getPixelSize());
-        this.text.setSingleLine(false);
-        this.text.setMaxLines(1);
+        this.text.setPadding(0, 0, 0, 0);    //When created programatically sets to non zero values
     }
     public LabelledText(ConstraintLayoutHandler layout, String label) {
         this.layout  = layout;
@@ -67,7 +64,6 @@ public class LabelledText {
         layout.connect(label.getId(), ConstraintSet.TOP,    previousId,    ConstraintSet.BOTTOM);
         layout.connect(text,  ConstraintSet.LEFT,   label, ConstraintSet.RIGHT,  10);
         layout.connect(text,  ConstraintSet.TOP,    label, ConstraintSet.TOP);
-        layout.connect(text,  ConstraintSet.BOTTOM, label, ConstraintSet.BOTTOM);
         layout.apply();
     }
     public void setReadOnly(boolean yes) {
@@ -87,6 +83,9 @@ public class LabelledText {
         label.setTextSize(sizer.convertToPx(TypedValue.COMPLEX_UNIT_DIP, dp));
         text.setTextSize(sizer.convertToPx(TypedValue.COMPLEX_UNIT_DIP, dp));
     }
+    public String getValue() {
+        return text.getText().toString();
+    }
     public void setText(String value) {
         text.setText(value);
     }
@@ -98,5 +97,14 @@ public class LabelledText {
             label.setVisibility(View.GONE);
             label.setVisibility(View.GONE);
         }
+    }
+    public void setLines(int min, int max) {
+        this.text.setSingleLine(false);
+        text.setMinLines(min);
+        text.setMaxLines(max);
+    }
+    public void setLines(int lines) {
+        this.text.setSingleLine(false);
+        text.setLines(lines);
     }
 }

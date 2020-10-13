@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -18,12 +17,12 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.ConstraintSet;
 
 import com.cbc.android.Alert;
+import com.cbc.android.DeviceDetails;
 import com.cbc.android.EditTextHandler;
 import com.cbc.android.IntentHandler;
+import com.cbc.android.KeyValueStore;
 import com.cbc.android.Logger;
 import com.cbc.android.ScrollableTable;
 import com.cbc.android.SpinnerHandler;
@@ -40,24 +39,39 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    private void setScrollViewMax() {
+        View   setDebug = findViewById(R.id.setDebug);
+        boolean maxSet  = false;
+
+        int spaceRequired = findViewById(R.id.write).getHeight() + findViewById(R.id.manageFiles).getHeight();
+
+        if (setDebug.getVisibility() == View.VISIBLE) spaceRequired += setDebug.getHeight();
+
+        maxSet = measuresView.setMaxHeight(spaceRequired, 6);
+    }
+    private void loadTable() {
+        measuresView.loadTable(measures);
+        setScrollViewMax();
+    }
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         FileHandler.Request request = FileHandler.Request.valueOf(data.getStringExtra(FileHandler.REQUEST));
-        /*
-         * The requestCode should be the ordinal of the request enum. This is
-         * returned in the intent data
-         */
-        if (request.ordinal() != requestCode) {
-            logger.info("Request Code " + requestCode + " does not match ordinal for " + request.toString());
+
+        if (resultCode != Activity.RESULT_OK) {
+            logger.error("File Handler returned result code " + resultCode);
             return;
         }
-        if (resultCode == Activity.RESULT_OK) {
-            logger.info("Request succeeded");
-        } else {
-            logger.info("File Handler returned result code " + resultCode);
-            return;
+        switch (request) {
+            case SelectFile:
+                String file = data.getStringExtra(FileHandler.SELECTED);
+
+                if (file != null) updateSaveFile(file);
+
+                break;
+            case ManageFiles:
+                break;
         }
     }
     private void startFileHandler(FileHandler.Request request, FileHandler.StorageType storageType) {
@@ -69,10 +83,6 @@ public class MainActivity extends AppCompatActivity {
         }
         startActivityForResult(intent, request.ordinal());
     }
-    public void testClicked(View view) {
-        startFileHandler(FileHandler.Request.GetPath, FileHandler.StorageType.Local);
-    }
-
     private enum ActionButtonName {Update, Save, Cancel}
 
     private class OnclickHandle implements View.OnClickListener {
@@ -108,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
             row     = null;
             setActionKeys(false);
 
-            if (load) measuresView.loadTable(measures);
+            if (load) loadTable();
         }
         private boolean mandatoryPresent() {
             if (!systolic.checkPresent())  return false;
@@ -305,6 +315,7 @@ public class MainActivity extends AppCompatActivity {
     private EditTextHandler diastolic     = null;
     private EditTextHandler pulse         = null;
     private EditTextHandler comment       = null;
+    private EditTextHandler currentFile   = null;
     private EditTextHandler time          = null;
     private EditTextHandler gap           = null;
     private Alert           alert         = null;
@@ -315,17 +326,22 @@ public class MainActivity extends AppCompatActivity {
     private Logger          logger        = new Logger("EnterMeasure");
     private Table           measures;
     private ScrollableTable measuresView;
+    private KeyValueStore   valueStore;
+    private File            saveFile;
 
+    private void updateSaveFile() {
+        valueStore.setValue("SaveFile", saveFile.getAbsolutePath());
+        currentFile.setText(saveFile.getAbsolutePath());
+    }
+    private void updateSaveFile(String file) {
+        saveFile = new File(file);
+        updateSaveFile();
+    }
     public void writeClicked(View view) {
         try {
             gapUpdater.endSession();
-            measures.save(getFilesDir(), "measures.txt", true);
-            /*
-             * This seems to work but can't find the file in Device File Explorer.
-             */
-            getApplicationContext().fileList();
-            File[] fs = getApplicationContext().getExternalFilesDirs(Environment.DIRECTORY_DOCUMENTS);
-            measures.save(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "testext.txt");
+            measures.save(saveFile, true);
+            updateSaveFile();
         } catch (JSONException | FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -335,10 +351,64 @@ public class MainActivity extends AppCompatActivity {
     public void loadClicked(View view) {
         gapUpdater.endSession();
         try {
-            measures.restore(getFilesDir(), "measures.txt");
-            measuresView.loadTable(measures);
+            if (!saveFile.exists()) {
+                alert.display("Validation Error", "File " + saveFile.getAbsolutePath() + " does not exist");
+                return;
+            }
+            if (saveFile.isDirectory()) {
+                alert.display("Validation Error", "File " + saveFile.getAbsolutePath() + " is a directory");
+                return;
+            }
+            measures.restore(saveFile);
+            loadTable();
         } catch (JSONException | FileNotFoundException e) {
             e.printStackTrace();
+        }
+    }
+    private void debugLog() {
+        Logger log            = new Logger(null);
+        Logger.LogViews views = log.createLogViews();
+        Logger.logDisplayStats();
+        views.addAll("Content",      findViewById(android.R.id.content));
+        views.add("Main Layout",     findViewById(R.id.cl));
+        views.add("Orientation",     findViewById(R.id.orientation));
+        views.add("Measures Scroll", findViewById(R.id.MeasuresBodyContainer));
+        views.add("Measures Body",   findViewById(R.id.MeasurementsBody));
+        views.add("Write",           findViewById(R.id.write));
+        views.add("Manage Files",    findViewById(R.id.manageFiles));
+        views.add("Set Debug",       findViewById(R.id.setDebug));
+        views.add("Debug",           findViewById(R.id.debug));
+        views.log();
+    }
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.gapLab:
+                Logger.setDebug(true);
+                break;
+            case R.id.sideLab:
+                Logger.setDebug(false);
+                break;
+            case R.id.systolicLab:
+                enableDebug(true);
+                break;
+            case R.id.diastolicLab:
+                enableDebug(false);
+                break;
+            case R.id.log:
+                debugLog();
+                break;
+            case R.id.manageFiles:
+                startFileHandler(FileHandler.Request.ManageFiles, FileHandler.StorageType.Local);
+                break;
+            case R.id.currentFile:
+                startFileHandler(FileHandler.Request.SelectFile, FileHandler.StorageType.Local);
+                break;
+            case R.id.setDebug:
+                debugLog();   //Call here as well to get details before the setDebug changes the screen.
+                setDebug();
+                break;
+            default:
+                logger.warning("OnClick id " + view.getId() + " not expected");
         }
     }
     private void displayTextSizeOptionClicked() {
@@ -355,7 +425,7 @@ public class MainActivity extends AppCompatActivity {
                 measuresView.setValuePixelSource(ScrollableTable.ValuePixelSource.Measure);
                 break;
         }
-        measuresView.loadTable(measures);
+        loadTable();
     }
     public void displayTextSizeOptionClicked(View view) {
         displayTextSizeOptionClicked();
@@ -365,13 +435,25 @@ public class MainActivity extends AppCompatActivity {
 
         if (fillScreen) {
             measuresView.setDisplayOptionsMode(ScrollableTable.DisplayWidthMode.FillScreen);
-            measuresView.loadTable(measures);
             view.setVisibility(View.GONE);
         } else {
             measuresView.setDisplayOptionsMode(ScrollableTable.DisplayWidthMode.OnOverflowFillScreen);
             view.setVisibility(View.VISIBLE);
             displayTextSizeOptionClicked();
         }
+        loadTable();
+    }
+    public void setDebug() {
+        CheckBox check = (CheckBox) findViewById(R.id.setDebug);
+
+        findViewById(R.id.debug).setVisibility(check.isChecked()? View.VISIBLE : View.GONE);
+    }
+    private void enableDebug(boolean on) {
+        findViewById(R.id.setDebug).setVisibility(on? View.VISIBLE : View.GONE);
+        DeviceDetails.setDebugEnabled(on);
+        Logger.setDebug(on);
+
+        findViewById(R.id.debug).setVisibility(View.GONE);
     }
     public void fillScreenChecked(View view) {
         setScreenDisplay(((CheckBox) view).isChecked());
@@ -403,13 +485,10 @@ public class MainActivity extends AppCompatActivity {
         action.setOnClickListener(R.id.save);
         action.setOnClickListener(R.id.cancel);
 
-        measuresView = new ScrollableTable(findViewById(R.id.save), 250);
-/*
         measuresView = new ScrollableTable(
                             (TableLayout) findViewById(R.id.MeasurementsHeader),
                             (TableLayout) findViewById(R.id.MeasurementsBody));
 
- */
         measuresView.setRowListener(rowListener);
         measuresView.setLogger(logger);
         measures = new Table("Measures");
@@ -428,13 +507,19 @@ public class MainActivity extends AppCompatActivity {
         alert       = new Alert(this);
         time        = new EditTextHandler(findViewById(R.id.time));
         gap         = new EditTextHandler(findViewById(R.id.gap));
-        orientation = new SpinnerHandler(findViewById(R.id.orientation), "|Lying|Seated Horizontal|Seated Vertical|Standing Horizontal|Standing Vertical", "\\|");
-        side        = new SpinnerHandler(findViewById(R.id.side),        "Left|Right", "\\|");
-        systolic    = new EditTextHandler(findViewById(R.id.systolic),   alert, "Systolic");
-        diastolic   = new EditTextHandler(findViewById(R.id.diastolic),  alert, "Diastolic");
-        pulse       = new EditTextHandler(findViewById(R.id.pulse),      alert, "Pulse");
-        comment     = new EditTextHandler(findViewById(R.id.comment),    alert, "Comment");
+        orientation = new SpinnerHandler(findViewById(R.id.orientation),  "|Lying|Seated Horizontal|Seated Vertical|Standing Horizontal|Standing Vertical", "\\|");
+        side        = new SpinnerHandler(findViewById(R.id.side),         "Left|Right", "\\|");
+        systolic    = new EditTextHandler(findViewById(R.id.systolic),    alert, "Systolic");
+        diastolic   = new EditTextHandler(findViewById(R.id.diastolic),   alert, "Diastolic");
+        pulse       = new EditTextHandler(findViewById(R.id.pulse),       alert, "Pulse");
+        comment     = new EditTextHandler(findViewById(R.id.comment),     alert, "Comment");
+        currentFile = new EditTextHandler(findViewById(R.id.currentFile), alert, "Current File");
+        valueStore  = new KeyValueStore(this, "Entermeasure");
+        saveFile    = new File(valueStore.getValue("SaveFile", new File(getFilesDir(), "measures.txt").getAbsolutePath()));
 
+        enableDebug(DeviceDetails.isEmulator());
+        updateSaveFile();
+        currentFile.setReadOnly(true);
         setTextSize(null, textSize);
         setScreenDisplay(false);
         systolic.setLister(tw);
@@ -443,5 +528,6 @@ public class MainActivity extends AppCompatActivity {
         pulse.setLister(tw);
         gapTimer.start();
         setActionKeys(false);
+        debugLog();
     }
 }

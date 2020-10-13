@@ -47,10 +47,10 @@ public class EditTextHandler {
     text.requestFocus();
   }
   public void setFocusable(boolean yes) {
-    /*
-     * Tried setFocusable, but it did not appear to work.
-     */
-    text.setEnabled(yes);
+    text.setFocusable(yes);
+  }
+  public void setReadOnly(boolean yes) {
+    text.setFocusable(!yes);
   }
   public boolean checkPresent() {
     if (getText().length() != 0) return true;
@@ -62,5 +62,8 @@ public class EditTextHandler {
   }
   public void setLister(TextWatcher tw) {
     text.addTextChangedListener(tw);
+  }
+  public EditText getEditText() {
+      return text;
   }
 }
