@@ -3,6 +3,9 @@ package com.cbc.android;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class KeyValueStore {
     private String                   storeName = null;
     private SharedPreferences        store     = null;
@@ -23,6 +26,30 @@ public class KeyValueStore {
     }
     public String getValue(String name, String defValue) {
         return store.getString(name, defValue);
+    }
+    /*
+     * Adds value to store value name, which must be a set.
+     */
+    public void addValue(String name, String value) {
+        Set<String> current = store.getStringSet(name, null);
+        Set<String> values  = new HashSet<String>();
+        /*
+         * Updating the current values does not work as current object has to change to force
+         * an update to file storage. Adding the new value to current only affects the memory storage
+         */
+        if (current != null) {
+            values.addAll(current);
+        }
+        values.add(value);
+        editor.putStringSet(name, values);
+        editor.commit();
+    }
+    public Set<String> getValues(String name) {
+        Set<String> values = store.getStringSet(name, null);
+
+        if (values == null) values = new HashSet<>();
+
+        return values;
     }
     public void remove(String name) {
         editor.remove(name);

@@ -287,8 +287,18 @@
             android:onClick="onClick"
             android:text="Manage Files"
             android:textAllCaps="false"
-            app:layout_constraintLeft_toLeftOf="@id/guideline"
-            app:layout_constraintRight_toRightOf="@id/guideline"
+            app:layout_constraintRight_toLeftOf="@id/guideline"
+            app:layout_constraintBottom_toTopOf="@id/setDebug" />
+        <Button
+            android:id="@+id/accessServer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:onClick="onClick"
+            android:text="Send to Server"
+            android:textAllCaps="false"
+            app:layout_constraintLeft_toRightOf="@id/guideline"
             app:layout_constraintBottom_toTopOf="@id/setDebug" />
 
         <CheckBox

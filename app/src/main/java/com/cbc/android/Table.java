@@ -229,7 +229,7 @@ public class Table {
         for (int i = 0; i < headers.size(); i++) {
             if (headers.get(i).getName().equals(name)) return i;
         }
-        if (mustExist) throw new RuntimeException("Column " + name + " does not exists in table " + name);
+        if (mustExist) throw new RuntimeException("Column " + name + " does not exists in table " + this.name);
         return -1;
     }
     /*

@@ -21,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.cbc.android.Alert;
 import com.cbc.android.DeviceDetails;
 import com.cbc.android.EditTextHandler;
+import com.cbc.android.EnumUtils;
 import com.cbc.android.IntentHandler;
 import com.cbc.android.KeyValueStore;
 import com.cbc.android.Logger;
@@ -38,8 +39,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    private enum ActivityRequestCode {FileHandler, AccessServer};
+
     private void setScrollViewMax() {
         View   setDebug = findViewById(R.id.setDebug);
         boolean maxSet  = false;
@@ -55,22 +60,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setScrollViewMax();
     }
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        ActivityRequestCode reqCode = ActivityRequestCode.values()[requestCode];
         super.onActivityResult(requestCode, resultCode, data);
 
-        FileHandler.Request request = FileHandler.Request.valueOf(data.getStringExtra(FileHandler.REQUEST));
+        switch (ActivityRequestCode.values()[requestCode]) {
+            case FileHandler:
+                FileHandler.Request request = FileHandler.Request.valueOf(data.getStringExtra(FileHandler.REQUEST));
 
-        if (resultCode != Activity.RESULT_OK) {
-            logger.error("File Handler returned result code " + resultCode);
-            return;
-        }
-        switch (request) {
-            case SelectFile:
-                String file = data.getStringExtra(FileHandler.SELECTED);
+                if (resultCode != Activity.RESULT_OK) {
+                    logger.error("File Handler returned result code " + resultCode);
+                    return;
+                }
+                switch (request) {
+                    case SelectFile:
+                        String file = data.getStringExtra(FileHandler.SELECTED);
 
-                if (file != null) updateSaveFile(file);
-
+                        if (file != null) updateSaveFile(file);
+                        break;
+                    case ManageFiles:
+                        break;
+                }
                 break;
-            case ManageFiles:
+            case AccessServer:
                 break;
         }
     }
@@ -81,7 +92,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (storageType != null) {
             intent.putExtra(FileHandler.STORAGE_TYPE, storageType.toString());
         }
-        startActivityForResult(intent, request.ordinal());
+        startActivityForResult(intent, ActivityRequestCode.FileHandler.ordinal());
+    }
+    private void startAccessServer() throws JSONException {
+        Intent intent = new Intent(this, AccessServer.class);
+
+        intent.putExtra("Data", measures.getJSON().toString());
+        startActivityForResult(intent, ActivityRequestCode.AccessServer.ordinal());
     }
     private enum ActionButtonName {Update, Save, Cancel}
 
@@ -129,6 +146,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         private void updateRow() {
             row.setCell("Time",          time.getText());
+            row.setCell("Session",       timeFormatter.format(gapUpdater.getSessionStart()));
             row.setCell("Session Index", gapUpdater.getSessionCount());
             row.setCell("Orientation",   orientation.getSelected());
             row.setCell("Side",          side.getSelected());
@@ -251,6 +269,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         public int getSessionCount() {
             return sessionCount;
+        }
+        public Date getSessionStart() {
+            return sessionStart;
         }
     }
     private class RowListener implements View.OnClickListener {
@@ -400,6 +421,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.manageFiles:
                 startFileHandler(FileHandler.Request.ManageFiles, FileHandler.StorageType.Local);
                 break;
+            case R.id.accessServer:
+                try {
+                    startAccessServer();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                break;
             case R.id.currentFile:
                 startFileHandler(FileHandler.Request.SelectFile, FileHandler.StorageType.Local);
                 break;
@@ -496,7 +524,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         measures.setTextSizer(new TextSizer(this, textSize));
         measuresView.setFullScreenBorder(2);
         measures.addColumnHeader("Time");
-        measures.addColumnHeader("Session Index", Table.ValueType.Int, false);;
+        measures.addColumnHeader("Session",       Table.ValueType.String, false);
+        measures.addColumnHeader("Session Index", Table.ValueType.Int, false);
         measures.addColumnHeader("Side",          false);
         measures.addColumnHeader("Orientation",   false);
         measures.addColumnHeader("Systolic",      Table.ValueType.Int);

@@ -1398,6 +1398,7 @@ id SHIFT
 id SYM
 id TOP_END
 id TOP_START
+id accessServer
 id accessibility_action_clickable_span
 id accessibility_custom_action_0
 id accessibility_custom_action_1
@@ -1451,9 +1452,11 @@ id action_text
 id actions
 id activity_chooser_view_content
 id add
+id addRoot
 id alertTitle
 id all
 id always
+id asLayout
 id async
 id auto
 id barrier
@@ -1481,6 +1484,7 @@ id comment
 id commentLab
 id complete
 id confirm_button
+id connect
 id container
 id content
 id contentPanel
@@ -1607,6 +1611,8 @@ id parallax
 id parent
 id parentPanel
 id parent_matrix
+id password
+id passwordLab
 id password_toggle
 id peekHeight
 id percent
@@ -1624,6 +1630,7 @@ id requestLab
 id right
 id right_icon
 id right_side
+id rootFields
 id rounded
 id save
 id save_non_transition_alpha
@@ -1647,15 +1654,17 @@ id search_src_text
 id search_voice_btn
 id select_dialog_listview
 id selected
+id send
+id server
+id serverLab
 id setDebug
 id setdisplaysize
-id setfilesoption
 id shortcut
+id show
 id showCustom
 id showHome
+id showLab
 id showTitle
-id showdirectory
-id showroots
 id side
 id sideLab
 id skipCollapsed
@@ -1722,6 +1731,9 @@ id unlabeled
 id up
 id update
 id useLogo
+id user
+id userLab
+id usessl
 id view_offset_helper
 id visible
 id withText
@@ -1788,6 +1800,7 @@ layout abc_search_dropdown_item_icons_2line
 layout abc_search_view
 layout abc_select_dialog_material
 layout abc_tooltip
+layout activity_access_server
 layout activity_file_handler
 layout activity_main
 layout custom_dialog

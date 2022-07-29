@@ -75,4 +75,28 @@ public class TextSizer {
 
         return units.getUnits(inches);
     }
+    public static int convertToPx(String sizeSpec) {
+        int    i;
+        float    size = -1;
+        String spec = "px";
+
+        for (i = 0; i < sizeSpec.length(); i++) {
+            if (!android.text.TextUtils.isDigitsOnly("" + sizeSpec.charAt(i))) break;
+        }
+        if (i != 0) {
+            size = Integer.parseInt(sizeSpec.substring(0, i));
+            spec = sizeSpec.substring(i);
+        }
+        Logger.debug("SizeSpec " + sizeSpec + " size " + size + " spec " + spec);
+
+        if (size != -1)  {
+            if (spec.equals("%"))
+                size = (float) (size * metrics.widthPixels / 100.0);
+            else if (spec.equals("dp"))
+                size = getPixels(size, Units.DP);
+            else
+                size = -1;
+        }
+        return (int) size;
+    }
 }

@@ -10,13 +10,20 @@ public class EditTextHandler {
   private Alert    alert;
   private String   label;
 
-  public EditTextHandler(View view) {
-    text = (EditText) view;
-  }
-  public EditTextHandler(View view, Alert alerter, String label) {
-    text       = (EditText) view;
+  protected EditTextHandler(Alert alerter, String label) {
     alert      = alerter;
     this.label = label;
+  }
+  protected void setView(View view) {
+    text = (EditText) view;
+  }
+  public EditTextHandler(View view) {
+    this(null, null);
+    setView(view);
+  }
+  public EditTextHandler(View view, Alert alerter, String label) {
+    this(alerter, label);
+    setView(view);
   }
   public String getText() {
     text.getPaint().measureText("sss");
@@ -52,13 +59,41 @@ public class EditTextHandler {
   public void setReadOnly(boolean yes) {
     text.setFocusable(!yes);
   }
+  public int getId() {
+    return  text.getId();
+  }
+  public void alert(String message) {
+    alert.display("Validation Error", (label != null? "For " + label + "-" : "") + message);
+    setFocus();
+  }
   public boolean checkPresent() {
     if (getText().length() != 0) return true;
 
-    alert.display("Validation Error", "Must provide a value" + (label != null? " for " + label : ""));
-    setFocus();
+    alert("Must provide a value");
 
     return false;
+  }
+  public void setVisible(boolean yes) {
+    if (yes) {
+      text.setVisibility(View.VISIBLE);
+    } else {
+      text.setVisibility(View.GONE);
+    }
+  }
+  public void setLines(int min, int max) {
+    text.setSingleLine(false);
+    text.setMinLines(min);
+    text.setMaxLines(max);
+  }
+  public void setLines(int lines) {
+    text.setSingleLine(false);
+    text.setLines(lines);
+  }
+  public void setOnClickListener(View.OnClickListener listener) {
+    text.setOnClickListener(listener);
+  }
+  public void setBackgroundColor(int color) {
+    text.setBackgroundColor(color);
   }
   public void setLister(TextWatcher tw) {
     text.addTextChangedListener(tw);

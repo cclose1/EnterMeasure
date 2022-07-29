@@ -11,13 +11,12 @@ import android.widget.TextView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 
-public class LabelledText {
-    private TextView  label = null;
-    private EditText text  = null;
-    private ViewGroup group = null;
-    private TextSizer sizer = null;
-    private Context   context = null;
-    private ConstraintLayoutHandler layout = null;
+public class LabelledText extends EditTextHandler {
+    private TextView                label   = null;
+    private ViewGroup               group   = null;
+    private TextSizer               sizer   = null;
+    private Context                 context = null;
+    private ConstraintLayoutHandler layout  = null;
 
     private View add(View view) {
         view.setId(View.generateViewId());
@@ -30,26 +29,50 @@ public class LabelledText {
 
         return view;
     }
-    private void initialise(String label) {
+    private void initialise(int labelGap, String displayWidth) {
         this.sizer = new TextSizer(context);
-        this.label = (TextView) add(new TextView(context));
-        this.text  = (EditText) add(new EditText(context));
-        this.label.setText(label);
         this.label.setTextSize(sizer.getPixelSize());
-        this.text.setBackground(null);
-        this.text.setInputType(InputType.TYPE_CLASS_TEXT);
-        this.text.setTextSize(sizer.getPixelSize());
-        this.text.setPadding(0, 0, 0, 0);    //When created programatically sets to non zero values
+
+        if (labelGap != -1) this.label.setPadding(0, 0, labelGap, 0);
+
+        if (displayWidth.length() != 0) getEditText().setWidth(TextSizer.convertToPx(displayWidth));
+
+        getEditText().setBackground(null);
+        getEditText().setInputType(InputType.TYPE_CLASS_TEXT);
+        getEditText().setTextSize(sizer.getPixelSize());
+        getEditText().setPadding(0, 0, 0, 0);    //When created programmatically sets to non zero values
     }
-    public LabelledText(ConstraintLayoutHandler layout, String label) {
+    private void initialise(String label, int labelGap, String displayWidth) {
+        this.label = (TextView) add(new TextView(context));
+        setView(add(new EditText(context)));
+        this.label.setText(label);
+
+        initialise(labelGap, displayWidth);
+    }
+    public LabelledText(ConstraintLayoutHandler layout, String label, String width, Alert alerter) {
+        super(alerter, label);
         this.layout  = layout;
         this.context = layout.getLayout().getContext();
-        initialise(label);
+        initialise(label, -1, width);
     }
-    public LabelledText(ViewGroup group, String label) {
+    public LabelledText(ConstraintLayoutHandler layout, String label) {
+        this(layout, label, "", null);
+    }
+    public LabelledText(ViewGroup group, String label, String width, Alert alerter) {
+        super(alerter, label);
         this.group   = group;
         this.context = group.getContext();
-        initialise(label);
+        initialise(label, 10, width);
+    }
+    public LabelledText(View label, View text, String width, Alert alerter) {
+        super(alerter, ((TextView) label).getText().toString());
+        this.label   = (TextView) label;
+        this.context = label.getContext();
+        setView(text);
+        initialise(-1, width);
+    }
+    public LabelledText(ViewGroup group, String label) {
+        this(group, label,"", null);
     }
     /*
      * This method will fail if the parent group is not a ConstraintLayout. This is possible if the
@@ -60,51 +83,33 @@ public class LabelledText {
 
         if (layout == null) layout = new ConstraintLayoutHandler(group);
 
-        layout.connect(label.getId(), horizontalPos,        horizontalId,  horizontalPos);
-        layout.connect(label.getId(), ConstraintSet.TOP,    previousId,    ConstraintSet.BOTTOM);
-        layout.connect(text,  ConstraintSet.LEFT,   label, ConstraintSet.RIGHT,  10);
-        layout.connect(text,  ConstraintSet.TOP,    label, ConstraintSet.TOP);
+        layout.connect(label.getId(), horizontalPos,      horizontalId, horizontalPos);
+        layout.connect(label.getId(), ConstraintSet.TOP,  previousId,   ConstraintSet.BOTTOM);
+        layout.connect(getEditText(), ConstraintSet.LEFT, label,        ConstraintSet.RIGHT,  10);
+        layout.connect(getEditText(), ConstraintSet.TOP,  label,        ConstraintSet.TOP);
         layout.apply();
     }
     public void setReadOnly(boolean yes) {
-        text.setFocusable(!yes);
-        text.setFocusableInTouchMode(!yes) ;
-        text.setClickable(!yes);
-        text.setLongClickable(!yes);
-        text.setCursorVisible(!yes) ;
-    }
-    public EditText getText() {
-        return text;
+        getEditText().setFocusable(!yes);
+        getEditText().setFocusableInTouchMode(!yes) ;
+        getEditText().setClickable(!yes);
+        getEditText().setLongClickable(!yes);
+        getEditText().setCursorVisible(!yes) ;
     }
     public TextView getLabel() {
         return label;
     }
     public void setTextSize(int dp) {
         label.setTextSize(sizer.convertToPx(TypedValue.COMPLEX_UNIT_DIP, dp));
-        text.setTextSize(sizer.convertToPx(TypedValue.COMPLEX_UNIT_DIP, dp));
-    }
-    public String getValue() {
-        return text.getText().toString();
-    }
-    public void setText(String value) {
-        text.setText(value);
+        getEditText().setTextSize(sizer.convertToPx(TypedValue.COMPLEX_UNIT_DIP, dp));
     }
     public void setVisible(boolean yes) {
         if (yes) {
             label.setVisibility(View.VISIBLE);
-            text.setVisibility(View.VISIBLE);
+            super.setVisible(yes);
         } else {
             label.setVisibility(View.GONE);
-            label.setVisibility(View.GONE);
+            super.setVisible(yes);
         }
-    }
-    public void setLines(int min, int max) {
-        this.text.setSingleLine(false);
-        text.setMinLines(min);
-        text.setMaxLines(max);
-    }
-    public void setLines(int lines) {
-        this.text.setSingleLine(false);
-        text.setLines(lines);
     }
 }

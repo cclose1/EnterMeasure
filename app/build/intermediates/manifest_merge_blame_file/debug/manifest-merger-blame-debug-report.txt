@@ -14,64 +14,80 @@
 11-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:5:5-68
 11-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:5:22-65
 12    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-12-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:7:5-81
-12-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:7:22-78
+12-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:6:5-81
+12-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:6:22-78
 13    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-13-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:8:5-80
-13-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:8:22-77
-14
-15    <!--
-16    This used to work, but now causes Illegal state exception
-17    android:theme="@style/AppTheme">
-18    -->
-19    <application
-19-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:14:5-36:19
-20        android:allowBackup="true"
-20-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:15:9-35
-21        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
-21-->[androidx.core:core:1.3.0] C:\Users\chris\.gradle\caches\transforms-2\files-2.1\8dcd1701ae68e2a64de609ba4b65471f\core-1.3.0\AndroidManifest.xml:24:18-86
-22        android:debuggable="true"
-23        android:extractNativeLibs="false"
-24        android:icon="@drawable/pengbrew"
-24-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:16:9-42
-25        android:label="@string/app_name"
-25-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:17:9-41
-26        android:roundIcon="@drawable/pengbrew"
-26-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:18:9-47
-27        android:supportsRtl="true"
-27-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:19:9-35
-28        android:testOnly="true"
-29        android:theme="@style/Theme.AppCompat.Light.DarkActionBar" >
-29-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:20:9-67
-30        <activity android:name="com.cbc.entermeasure.MainActivity" >
-30-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:21:9-27:20
-30-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:21:19-47
-31            <intent-filter>
-31-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:22:13-26:29
-32                <action android:name="android.intent.action.MAIN" />
-32-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:23:17-69
-32-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:23:25-66
-33
-34                <category android:name="android.intent.category.LAUNCHER" />
-34-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:25:17-77
-34-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:25:27-74
-35            </intent-filter>
-36        </activity>
-37        <activity
-37-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:28:9-35:20
-38            android:name="com.cbc.entermeasure.FileHandler"
-38-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:29:13-40
-39            android:label="@string/FileHandler"
-39-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:30:13-48
-40            android:parentActivityName="com.cbc.entermeasure.MainActivity" >
-40-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:31:13-55
-41            <meta-data
-41-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:32:13-34:49
-42                android:name="android.support.PARENT_ACTIVITY"
-42-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:33:17-63
-43                android:value=".MainActivity" />
-43-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:34:17-46
-44        </activity>
-45    </application>
-46
-47</manifest>
+13-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:7:5-80
+13-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:7:22-77
+14    <uses-permission android:name="android.permission.INTERNET" />
+14-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:8:5-67
+14-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:8:22-64
+15
+16    <application
+16-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:10:5-41:19
+17        android:allowBackup="true"
+17-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:12:9-35
+18        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+18-->[androidx.core:core:1.3.0] C:\Users\chris\.gradle\caches\transforms-2\files-2.1\817a61a686dfd849f92445d1d98580bd\core-1.3.0\AndroidManifest.xml:24:18-86
+19        android:debuggable="true"
+20        android:extractNativeLibs="false"
+21        android:icon="@drawable/pengbrew"
+21-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:13:9-42
+22        android:label="@string/app_name"
+22-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:14:9-41
+23        android:roundIcon="@drawable/pengbrew"
+23-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:15:9-47
+24        android:supportsRtl="true"
+24-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:16:9-35
+25        android:testOnly="true"
+26        android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
+26-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:17:9-67
+27        android:usesCleartextTraffic="true" >
+27-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:11:9-44
+28        <activity android:name="com.cbc.entermeasure.MainActivity" >
+28-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:18:9-24:20
+28-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:18:19-47
+29            <intent-filter>
+29-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:19:13-23:29
+30                <action android:name="android.intent.action.MAIN" />
+30-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:20:17-69
+30-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:20:25-66
+31
+32                <category android:name="android.intent.category.LAUNCHER" />
+32-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:22:17-77
+32-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:22:27-74
+33            </intent-filter>
+34        </activity>
+35        <activity
+35-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:25:9-32:20
+36            android:name="com.cbc.entermeasure.AccessServer"
+36-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:26:13-41
+37            android:label="Access Server"
+37-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:27:13-42
+38            android:parentActivityName="com.cbc.entermeasure.MainActivity" >
+38-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:28:13-55
+39            <meta-data
+39-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:29:13-31:49
+40                android:name="android.support.PARENT_ACTIVITY"
+40-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:30:17-63
+41                android:value=".MainActivity" />
+41-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:31:17-46
+42        </activity>
+43        <activity
+43-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:33:9-40:20
+44            android:name="com.cbc.entermeasure.FileHandler"
+44-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:34:13-40
+45            android:label="@string/FileHandler"
+45-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:35:13-48
+46            android:parentActivityName="com.cbc.entermeasure.MainActivity" >
+46-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:36:13-55
+47            <meta-data
+47-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:29:13-31:49
+48                android:name="android.support.PARENT_ACTIVITY"
+48-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:30:17-63
+49                android:value=".MainActivity" />
+49-->C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:31:17-46
+50        </activity>
+51    </application>
+52
+53</manifest>

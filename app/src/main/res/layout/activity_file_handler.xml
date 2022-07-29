@@ -1,153 +1,159 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-
-    android:id="@+id/fhLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".FileHandler">
+    android:fillViewport="true"
+    android:scrollbars="vertical|horizontal">
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.5" />
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
 
-    <TextView
-        android:id="@+id/requestLab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingTop="10dp"
-        android:paddingRight="3dp"
-        android:text="@string/request"
-        app:layout_constraintRight_toLeftOf="@id/guideline"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:id="@+id/fhLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".FileHandler">
 
-    <EditText
-        android:id="@+id/request"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:ems="10"
-        android:inputType="datetime"
-        app:layout_constraintBottom_toBottomOf="@id/requestLab"
-        app:layout_constraintLeft_toRightOf="@id/guideline" />
-
-    <TextView
-        android:id="@+id/storageTypeLab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingTop="10dp"
-        android:paddingRight="3dp"
-        android:text="@string/storagetype"
-        app:layout_constraintRight_toLeftOf="@id/guideline"
-        app:layout_constraintTop_toBottomOf="@id/requestLab" />
-
-    <Spinner
-        android:id="@+id/storageType"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@id/storageTypeLab"
-        app:layout_constraintLeft_toRightOf="@id/guideline" />
-
-    <RadioGroup
-        android:id="@+id/setfilesoption"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-
-        app:layout_constraintLeft_toLeftOf="@id/guideline"
-        app:layout_constraintRight_toRightOf="@id/guideline"
-        app:layout_constraintTop_toBottomOf="@id/storageType">
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5" />
 
         <TextView
+            android:id="@+id/requestLab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="10dp"
-            android:text="Show"
-            app:layout_constraintLeft_toLeftOf="parent"
+            android:paddingRight="3dp"
+            android:text="@string/request"
+            app:layout_constraintRight_toLeftOf="@id/guideline"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <RadioButton
-            android:id="@+id/showdirectory"
+        <EditText
+            android:id="@+id/request"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:checked="true"
-            android:onClick="radioOptionClicked"
-            android:text="@string/showDirectory" />
+            android:background="@android:color/transparent"
+            android:ems="10"
+            android:inputType="datetime"
+            app:layout_constraintBottom_toBottomOf="@id/requestLab"
+            app:layout_constraintLeft_toRightOf="@id/guideline" />
 
-        <RadioButton
-            android:id="@+id/showroots"
+        <TextView
+            android:id="@+id/storageTypeLab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="radioOptionClicked"
-            android:text="@string/showRoots" />
-    </RadioGroup>
-
-    <LinearLayout
-        android:id="@+id/manageFields"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:orientation="horizontal"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/setfilesoption">
-
-        <Button
-            android:id="@+id/create"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:onClick="onClick"
-            android:text="Create"
-            android:textAllCaps="false" />
+            android:paddingTop="10dp"
+            android:paddingRight="3dp"
+            android:text="@string/storagetype"
+            app:layout_constraintRight_toLeftOf="@id/guideline"
+            app:layout_constraintTop_toBottomOf="@id/requestLab" />
 
         <Spinner
-            android:id="@+id/fileType"
+            android:id="@+id/storageType"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical" />
-
-        <EditText
-            android:id="@+id/name"
+            app:layout_constraintBottom_toBottomOf="@id/storageTypeLab"
+            app:layout_constraintLeft_toRightOf="@id/guideline" />
+        <TextView
+            android:id="@+id/showLab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:background="#e6ffff"
-            android:ems="10"
-            android:inputType="text"
-            android:textAllCaps="false" />
-    </LinearLayout>
+            android:paddingTop="10dp"
+            android:paddingRight="3dp"
+            android:text="Show"
+            app:layout_constraintRight_toLeftOf="@id/guideline"
+            app:layout_constraintTop_toBottomOf="@id/storageTypeLab" />
 
-    <LinearLayout
-        android:id="@+id/lcomplete"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintLeft_toLeftOf="@id/guideline"
-        app:layout_constraintRight_toRightOf="@id/guideline"
-        app:layout_constraintTop_toBottomOf="@id/manageFields">
+        <Spinner
+            android:id="@+id/show"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@id/showLab"
+            app:layout_constraintLeft_toRightOf="@id/guideline" />
+
+        <LinearLayout
+            android:id="@+id/manageFields"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/showLab">
+
+            <Button
+                android:id="@+id/create"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onClick"
+                android:text="Create"
+                android:textAllCaps="false" />
+
+            <Spinner
+                android:id="@+id/fileType"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical" />
+
+            <EditText
+                android:id="@+id/name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:background="#e6ffff"
+                android:ems="10"
+                android:inputType="text"
+                android:textAllCaps="false" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/rootFields"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/manageFields">
+
+            <Button
+                android:id="@+id/addRoot"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onClick"
+                android:text="Add Root"
+                android:textAllCaps="false" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/lcomplete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintLeft_toLeftOf="@id/guideline"
+            app:layout_constraintRight_toRightOf="@id/guideline"
+            app:layout_constraintTop_toBottomOf="@id/rootFields">
+
+            <Button
+                android:id="@+id/complete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onComplete"
+                android:text="Complete"
+                android:textAllCaps="false" />
+        </LinearLayout>
 
         <Button
-            android:id="@+id/complete"
+            android:id="@+id/log"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:onClick="onComplete"
-            android:text="Complete"
-            android:textAllCaps="false" />
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/log"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:onClick="onClick"
-        android:text="Log"
-        android:textAllCaps="false"
-        app:layout_constraintLeft_toLeftOf="@id/guideline"
-        app:layout_constraintRight_toRightOf="@id/guideline"
-        app:layout_constraintTop_toBottomOf="@id/lcomplete" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+            android:onClick="onClick"
+            android:text="Log"
+            android:textAllCaps="false"
+            app:layout_constraintLeft_toLeftOf="@id/guideline"
+            app:layout_constraintRight_toRightOf="@id/guideline"
+            app:layout_constraintTop_toBottomOf="@id/lcomplete" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

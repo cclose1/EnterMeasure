@@ -69,7 +69,7 @@ public class ScrollableTable {
                 return width;
             }
             public void applyMinWidth() {
-                if (width < min)
+                if (width <= min || reducablePixels == 0)
                     width = min;
                 else
                     width -= (width - min) * excessMinPixels / reducablePixels;
@@ -306,7 +306,7 @@ public class ScrollableTable {
 
         displayOptions = new DisplayOptions();
         /*
-         * The clone statement must be called after
+         * The clone statement must be called after the views have been added to the layout.
          */
 
         cs.clone(layout);

@@ -3,6 +3,7 @@ package com.cbc.entermeasure;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.MenuItem;
@@ -10,7 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.RadioGroup;
+import android.widget.CheckBox;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintSet;
@@ -20,6 +21,7 @@ import com.cbc.android.ConstraintLayoutHandler;
 import com.cbc.android.DeviceDetails;
 import com.cbc.android.EditTextHandler;
 import com.cbc.android.IntentHandler;
+import com.cbc.android.KeyValueStore;
 import com.cbc.android.LabelledText;
 import com.cbc.android.Logger;
 import com.cbc.android.ScrollableTable;
@@ -37,6 +39,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 public class FileHandler extends AppCompatActivity implements AdapterView.OnItemSelectedListener, View.OnClickListener {
     static public String REQUEST      = "com.cbc.entermeasure.request";
@@ -44,7 +47,7 @@ public class FileHandler extends AppCompatActivity implements AdapterView.OnItem
     static public String SELECTED     = "com.cbc.entermeasure.selected";
 
     public enum Request     {SelectFile, ManageFiles}
-    public enum StorageType {Local, External}
+    public enum StorageType {Local, External, Dynamic}
     public enum FileType    {File, Directory}
 
     private class Files {
@@ -124,6 +127,12 @@ public class FileHandler extends AppCompatActivity implements AdapterView.OnItem
                 Logger.debug(type.toString() + " directory " + root.getAbsolutePath() + " already added");
             else {
                 dirs.add(root);
+                /*
+                 * If the current type matches type and the root is null set it to the newly added root. This
+                 * can only happen on the first root added for type.
+                 */
+                if (type == source && this.root == null) this.root = root;
+
                 Logger.debug(type.toString() + " directory " + root.getAbsolutePath() + " added");
             }
         }
@@ -140,13 +149,18 @@ public class FileHandler extends AppCompatActivity implements AdapterView.OnItem
         }
         private void setDirectory(File directory) {
             this.directory = directory;
-            FileReader.DirectoryStats ds = FileReader.getDirectoryStats(directory);
-            files = directory.listFiles();
+
+            if (directory != null) {
+                FileReader.DirectoryStats ds = FileReader.getDirectoryStats(directory);
+                files = directory.listFiles();
+            } else {
+                files = null;
+            }
         }
         private boolean setRoot(StorageType type, File root) throws IOException {
             ArrayList<File> dirs = roots.get(type);
 
-            if (dirs.contains(root)) {
+            if (root == null || dirs != null && dirs.contains(root)) {
                 this.source = type;
                 this.root   = root;
                 setDirectory(root);
@@ -155,9 +169,9 @@ public class FileHandler extends AppCompatActivity implements AdapterView.OnItem
             return false;
         }
         public void setRoot(StorageType type) throws IOException {
-            File root = roots.get(type).get(0);
+            File root =  roots.get(type) == null? null : roots.get(type).get(0);
 
-            if (root != null) setRoot(type, root);
+            setRoot(type, root);
         }
         /*
          * Sets root directory to root. If root is not in the roots collection an IOException is thrown
@@ -172,7 +186,7 @@ public class FileHandler extends AppCompatActivity implements AdapterView.OnItem
             return root;
         }
         public String checkCanRemove(StorageType type, File file) {
-            if (file.isFile()) return "";
+            if (file.isFile() || roots.get(type) == null) return "";
 
             for (File f: roots.get(type)) {
                 if (same(f, file)) return "File " + file.getAbsolutePath() + " is a root directory";
@@ -182,14 +196,21 @@ public class FileHandler extends AppCompatActivity implements AdapterView.OnItem
             return "";
         }
         public String checkCanRemove(File file) {
-            String result = checkCanRemove(StorageType.Local, file);
+            StorageType types[] = StorageType.values();
+            String      result  = "";
 
-            if (result.length() != 0) return result;
+            for(StorageType type: types) {
+                result = checkCanRemove(type, file);
 
-            return checkCanRemove(StorageType.External, file);
+                if (result.length() != 0) return result;
+            }
+            return "";
         }
         public boolean canRemove(File file) {
             return checkCanRemove(file).length() == 0;
+        }
+        public boolean isRoot(File file) {
+            return !canRemove(file);
         }
         public File getDirectory() {
             return directory;
@@ -243,18 +264,21 @@ public class FileHandler extends AppCompatActivity implements AdapterView.OnItem
             logger.info("Deleted file " + file.getAbsolutePath());
         }
         public void create(FileType type, String name) throws IOException {
-            File file = new File(directory, name);
+            boolean created = false;
+            File    file    = new File(directory, name);
 
             if (file.exists()) throw new IOException(type.toString() + " " + name + " already exists in " + directory.toString());
 
             switch (type) {
                 case File:
-                    file.createNewFile();
+                    created = file.createNewFile();
                     break;
                 case Directory:
-                    file.mkdir();
+                    created = file.mkdir();
                     break;
             }
+            if (!created) throw new IOException("Create of " + name + "-ignored. No error reported");
+
             loadFiles();
         }
     }
@@ -318,28 +342,43 @@ public class FileHandler extends AppCompatActivity implements AdapterView.OnItem
     private EditTextHandler         createName    = null;
     private SpinnerHandler          spStorageType = null;
     private SpinnerHandler          spFileType    = null;
+    private SpinnerHandler          spShow        = null;
     private Logger                  logger        = new Logger("FileHandler");
     private Files                   files         = new Files();
     private DateFormatter           timeFormatter = new DateFormatter("yyyy-MM-dd HH:mm:ss", false);
     private ConstraintLayoutHandler layout        = null;
+    private ViewGroup               rootLayout    = null;
 
-    private ScrollableTable  filesView      = null;
-    private Table            filesTable     = null;
-    private LabelledText     fldRoot        = null;
-    private LabelledText     fldDirectory   = null;
-    private Button           fldUp          = null;
-    private ButtonListener   buttonListener = new ButtonListener();
-    private FileDeleter      deleter        = null;
-    private RadioGroup       show           = null;
-    private int              rootNameSize   = 39;
-    private int              dirNameSize    = 14;
+    private ScrollableTable filesView      = null;
+    private Table           filesTable     = null;
+    private LabelledText    fldRoot        = null;
+    private LabelledText    fldRootPath    = null;
+    private LabelledText    fldDirectory   = null;
+    private KeyValueStore   rootStore      = null;
+    private Button          fldUp          = null;
+    private CheckBox        persist        = null;
+    private ButtonListener  buttonListener = new ButtonListener();
+    private FileDeleter     deleter        = null;
+    private int             rootNameSize   = 39;
+    private int             dirNameSize    = 14;
 
+    private void setTableFields(boolean directory) {
+        findViewById(R.id.manageFields).setVisibility(directory? View.VISIBLE : View.GONE);
+        findViewById(R.id.rootFields).setVisibility(directory? View.GONE : View.VISIBLE);
+        /*
+         * Changing the visibility of rootFields does not work, do it for each field.
+         */
+        findViewById(R.id.addRoot).setVisibility(directory? View.GONE : View.VISIBLE);
+        persist.setVisibility(directory? View.GONE : View.VISIBLE);
+        fldRootPath.setVisible(!directory);
+    }
     private void setTable(boolean directory) {
         filesTable.removeRows();
         filesTable.setMaxLength("Name", directory? dirNameSize : rootNameSize);
         filesTable.setColumnVisible("Type",     directory);
         filesTable.setColumnVisible("Modified", directory);
         filesTable.setColumnVisible("Size",     directory);
+        setTableFields(directory);
     }
     private void addRow(Table table, File file, boolean isRoot) {
         Table.Row row  = table.createRow();
@@ -360,7 +399,7 @@ public class FileHandler extends AppCompatActivity implements AdapterView.OnItem
         for (Iterator<File> it = files.iterator((StorageType) spStorageType.getEnumSelected()); it.hasNext(); ) {
             addRow(filesTable, it.next(), true);
         }
-        fldRoot.setText(files.getRoot().getAbsolutePath());
+        fldRoot.setText(files.getRoot() == null? "" : files.getRoot().getAbsolutePath());
         filesView.loadTable(filesTable, true);
     }
     private void displayFileDirectory() {
@@ -391,42 +430,38 @@ public class FileHandler extends AppCompatActivity implements AdapterView.OnItem
         }
     }
     private boolean isShowDirectory() {
-        switch (show.getCheckedRadioButtonId()) {
-            case R.id.showdirectory:
-                return true;
-            case R.id.showroots:
-                return false;
-            default:
-                logger.warning("Show Radio Group " + show.getCheckedRadioButtonId() + " is not expected");
-        }
-        return true;
+        return spShow.getSelected().equals("Directory");
     }
     private void displayFilesTable() throws Exception {
         StorageType st = spStorageType.getEnumSelected();
 
         if (isShowDirectory()) {
-            files.setRoot(st);
             displayFileDirectory();
         } else
             displayRootDirectory();
     }
     @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) { switch (parent.getId()) {
-            case R.id.storageType:
-                logger.info(
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        try {
+            switch (parent.getId()) {
+                case R.id.storageType:
+                    logger.info(
                         "StorageType selected position " + position     +
                         " view id "                      + view.getId() +
                         " value "                        + spStorageType.getValueAtPosition(position) +
                         " parent class "                 + parent.getClass().getName());
-                try {
+                    files.setRoot((StorageType) spStorageType.getEnumSelected());
                     displayFilesTable();
-                } catch (Exception e) {
-                    logger.error("Position " + position + " not found in storage type spinner", e);
-                }
+                    break;
+                case R.id.show:
+                    displayFilesTable();
                 break;
             default:
                 logger.warning("OnItemSelected for id " + parent.getId() + " ignored");
         }
+    } catch (Exception e) {
+        logger.error("Position " + position + " not found in storage type spinner", e);
+    }
     }
     private class ButtonListener implements View.OnClickListener {
         @Override
@@ -457,8 +492,8 @@ public class FileHandler extends AppCompatActivity implements AdapterView.OnItem
         try {
             if (id ==  R.id.log) {
                 debugLog();
-            } else if (id == fldDirectory.getText().getId()) {
-                String name  = fldDirectory.getValue();
+            } else if (id == fldDirectory.getId()) {
+                String name  = fldDirectory.getText();
                 File   file  = files.getDirectory();
                 String check = files.checkCanRemove(file);
 
@@ -485,6 +520,25 @@ public class FileHandler extends AppCompatActivity implements AdapterView.OnItem
                 } catch (IOException e) {
                     alert.display("Error", e.toString());
                 }
+            } else if (id == R.id.addRoot) {
+                if (!fldRootPath.checkPresent()) return;
+
+                File root = new File(fldRootPath.getText());
+
+                if (!root.isDirectory()) {
+                    fldRootPath.alert("Must be a directory");
+                    return;
+                }
+                if (files.isRoot(root)) {
+                    fldRootPath.alert("Already a root directory");
+                    return;
+                }
+                files.addRoot(StorageType.Dynamic, root);
+
+                if (persist.isChecked()) rootStore.addValue("Roots", fldRootPath.getText());
+
+                fldRootPath.setText("");
+                displayRootDirectory();
             } else
                 logger.warning("OnClick id " + view.getId() + " not expected");
         } catch (Exception e) {
@@ -510,7 +564,7 @@ public class FileHandler extends AppCompatActivity implements AdapterView.OnItem
                     }
                 } else {
                     files.setRoot(new File(file));
-                    show.check(R.id.showdirectory);
+                    spShow.setSelected("Directory");
                 }
                 displayFileDirectory();
             } catch (IOException e) {
@@ -548,15 +602,6 @@ public class FileHandler extends AppCompatActivity implements AdapterView.OnItem
             logger.info("Directory " + Logger.rPad(name, 19) + " path " + getAbsolutePath(directories[i]));
         }
     }
-    public void radioOptionClicked(View view) throws Exception {
-        switch (((RadioGroup) view.getParent()).getId()) {
-            case R.id.setfilesoption:
-                displayFilesTable();
-                break;
-            default:
-                logger.warning("Radio Group " + view.getId() + " not expected");
-        }
-    }
     private void setScreen() {
         int visible = etRequest.getText().equals("ManageFiles")? View.VISIBLE : View.GONE;
 
@@ -581,6 +626,7 @@ public class FileHandler extends AppCompatActivity implements AdapterView.OnItem
         }
         return super.onOptionsItemSelected(item);
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -590,25 +636,32 @@ public class FileHandler extends AppCompatActivity implements AdapterView.OnItem
         createName    = new EditTextHandler(findViewById(R.id.name), alert, "Create File");
         spStorageType = new SpinnerHandler(findViewById(R.id.storageType), StorageType.class);
         spFileType    = new SpinnerHandler(findViewById(R.id.fileType),    FileType.class);
+        spShow        = new SpinnerHandler(findViewById(R.id.show),        "Roots|Directory", "\\|");
         intent        = new IntentHandler(getIntent());
         request       = intent.getEnumAction(Request.class);
         layout        = new ConstraintLayoutHandler(findViewById(R.id.fhLayout));
-        show          = (RadioGroup) findViewById(R.id.setfilesoption);
+        rootLayout    = (ViewGroup) findViewById(R.id.rootFields);
         deleter       = new FileDeleter(this);
         fldRoot       = new LabelledText(layout, "Root");
-        fldRoot.setConstraint(R.id.setfilesoption, ConstraintSet.LEFT, ConstraintSet.PARENT_ID);
+        persist       = new CheckBox(this);
+        persist.setText("Persist");
+        fldRoot.setConstraint(R.id.show, ConstraintSet.LEFT, ConstraintSet.PARENT_ID);
         fldRoot.setReadOnly(true);
         fldRoot.setLines(1, 2);
+        fldRootPath   = new LabelledText(rootLayout, "Path", "40%", alert);
+        fldRootPath.setBackgroundColor(Color.rgb(230,255,255));
+        rootLayout.addView(persist);
         fldDirectory  = new LabelledText((ViewGroup) layout.getLayout(), "Directory");
-        fldDirectory.setConstraint(fldRoot.getText().getId(), ConstraintSet.LEFT, ConstraintSet.PARENT_ID);
+        fldDirectory.setConstraint(fldRoot.getId(), ConstraintSet.LEFT, ConstraintSet.PARENT_ID);
         fldDirectory.setReadOnly(true);
-        fldDirectory.getText().setOnClickListener((View.OnClickListener) this);
+        fldDirectory.setOnClickListener(this);
         fldUp         = (Button) layout.addView(new Button(this));
         fldUp.setText("Up");
         fldUp.setOnClickListener(buttonListener);
-        filesView     = new ScrollableTable((View)fldDirectory.getText(), 300);
+        filesView     = new ScrollableTable((View) fldDirectory.getEditText(), 300);
         filesTable    = new Table("Files", this);
         etRequest.setText(request.toString());
+        rootStore     = new KeyValueStore(this, "roots");
 
         layout.connect(fldUp,             ConstraintSet.LEFT,  R.id.guideline,          ConstraintSet.LEFT);
         layout.connect(fldUp,             ConstraintSet.RIGHT, R.id.guideline,          ConstraintSet.RIGHT);
@@ -629,6 +682,7 @@ public class FileHandler extends AppCompatActivity implements AdapterView.OnItem
         filesView.setColumnGap(1);
         filesView.setRowListener(new TableRowListener());
         spStorageType.getSpinner().setOnItemSelectedListener(this);
+        spShow.getSpinner().setOnItemSelectedListener(this);
         logDir("DataDir",           getDataDir());
         logDir("FilesDir",          getFilesDir());
         logDir("CacheDir",          getCacheDir());
@@ -645,6 +699,11 @@ public class FileHandler extends AppCompatActivity implements AdapterView.OnItem
         files.addRoots(StorageType.External, getExternalMediaDirs());
         files.addRoots(StorageType.External, getExternalCacheDirs());
         files.addRoots(StorageType.External, getExternalFilesDirs(null));
+//        files.addRoot(StorageType.Dynamic,   new File("/sdcard"));
+
+        for(String root : rootStore.getValues("Roots")) {
+            files.addRoot(StorageType.Dynamic, new File(root));
+        }
         setScreen();
         /*
          * Following is to stop the soft keyboard popping up and behave like a numeric keyboard when

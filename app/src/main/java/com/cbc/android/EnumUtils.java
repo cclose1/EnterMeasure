@@ -5,6 +5,9 @@ import java.util.ArrayList;
 public class EnumUtils<T extends Enum<T>> {
     private Class enumType;
 
+    public static <T extends Enum<T>> T get(Class<T> type, int index) {
+        return (T) type.getEnumConstants()[index];
+    }
     public EnumUtils(Class<T> type) {
         this.enumType = type;
     }
@@ -20,6 +23,9 @@ public class EnumUtils<T extends Enum<T>> {
         if (value == null) return null;
 
         return (T) Enum.valueOf(enumType, value);
+    }
+    public T value(int index) {
+        return (T) enumType.getEnumConstants()[index];
     }
     public String toString(T value) {
         return value.toString();

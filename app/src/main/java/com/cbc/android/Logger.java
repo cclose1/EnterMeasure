@@ -16,12 +16,11 @@ public class Logger {
         this.name = name;
         this.view = view;
 
-        maxName = getMax(maxName, name);
+        maxName  = getMax(maxName, name);
         maxClass = getMax(maxClass, view.getClass().getSimpleName());
       }
     }
-
-    private int maxName = 0;
+    private int maxName  = 0;
     private int maxClass = 0;
 
     private int getMax(int size, String value) {
@@ -154,6 +153,7 @@ public class Logger {
   static public void debug(String message) {
     o(Type.D, message);
   }
+
   static public void log(String description, View view) {
     Log.i("", description);
     Log.i("", "MeasuredHeight " + view.getMeasuredHeight());
