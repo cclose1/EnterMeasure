@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "C:\\MyFiles\\Android\\EnterMeasure\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-v21\\values-v21.xml",
+            "outputFile": "C:\\MyFiles\\EnterMeasure\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-v21\\values-v21.xml",
             "map": [
                 {
                     "source": "C:\\Users\\chris\\.gradle\\caches\\transforms-2\\files-2.1\\c9350c4470b6f4895016aaf418fed985\\material-1.1.0\\res\\values-v21\\values-v21.xml",

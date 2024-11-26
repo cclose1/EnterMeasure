@@ -70,13 +70,15 @@ public class AccessServer extends AppCompatActivity {
                     request = getRequest();
 
                     request.addParameter("action", "login");
+                    request.addParameter("mysql",  "true");
                     addConnectParameter(user);
                     addConnectParameter(password);
                     request.send();
                     break;
                 case R.id.send:
                     request = getRequest();
-                    request.addParameter("action",  "updates");
+                    request.addParameter("action", "updates");
+                    request.addParameter("mysql",  "true");
                     request.addParameter("user",    user.getText());
                     request.addParameter("updates", intent.getStringExtra("Data"));
                     request.send();

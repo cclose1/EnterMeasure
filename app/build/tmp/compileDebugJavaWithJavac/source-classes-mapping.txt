@@ -17,35 +17,6 @@ com/cbc/entermeasure/BuildConfig.java
  com.cbc.entermeasure.BuildConfig
 com/cbc/android/IntentHandler.java
  com.cbc.android.IntentHandler
-com/cbc/android/TextSizer.java
- com.cbc.android.TextSizer
- com.cbc.android.TextSizer$Units
-com/cbc/android/EditTextHandler.java
- com.cbc.android.EditTextHandler
-com/cbc/entermeasure/AccessServer.java
- com.cbc.entermeasure.AccessServer
- com.cbc.entermeasure.AccessServer$1
- com.cbc.entermeasure.AccessServer$Listeners
-com/cbc/android/ScreenUtils.java
- com.cbc.android.ScreenUtils
- com.cbc.android.ScreenUtils$Position
- com.cbc.android.ScreenUtils$ViewParent
-com/cbc/android/EnumUtils.java
- com.cbc.android.EnumUtils
-com/cbc/android/LabelledText.java
- com.cbc.android.LabelledText
-com/cbc/android/Logger.java
- com.cbc.android.Logger
- com.cbc.android.Logger$1
- com.cbc.android.Logger$LogViews
- com.cbc.android.Logger$LogViews$NamedView
- com.cbc.android.Logger$Type
-com/cbc/android/SpinnerHandler.java
- com.cbc.android.SpinnerHandler
-com/cbc/android/ConstraintLayoutHandler.java
- com.cbc.android.ConstraintLayoutHandler
-com/cbc/android/KeyValueStore.java
- com.cbc.android.KeyValueStore
 com/cbc/entermeasure/FileHandler.java
  com.cbc.entermeasure.FileHandler
  com.cbc.entermeasure.FileHandler$1
@@ -74,6 +45,35 @@ com/cbc/android/ScrollableTable.java
  com.cbc.android.ScrollableTable$DisplayOptions$Field
  com.cbc.android.ScrollableTable$DisplayWidthMode
  com.cbc.android.ScrollableTable$ValuePixelSource
+com/cbc/android/ScreenUtils.java
+ com.cbc.android.ScreenUtils
+ com.cbc.android.ScreenUtils$Position
+ com.cbc.android.ScreenUtils$ViewParent
+com/cbc/android/EnumUtils.java
+ com.cbc.android.EnumUtils
+com/cbc/android/LabelledText.java
+ com.cbc.android.LabelledText
+com/cbc/android/Logger.java
+ com.cbc.android.Logger
+ com.cbc.android.Logger$1
+ com.cbc.android.Logger$LogViews
+ com.cbc.android.Logger$LogViews$NamedView
+ com.cbc.android.Logger$Type
+com/cbc/android/SpinnerHandler.java
+ com.cbc.android.SpinnerHandler
+com/cbc/android/ConstraintLayoutHandler.java
+ com.cbc.android.ConstraintLayoutHandler
+com/cbc/android/KeyValueStore.java
+ com.cbc.android.KeyValueStore
+com/cbc/android/TextSizer.java
+ com.cbc.android.TextSizer
+ com.cbc.android.TextSizer$Units
+com/cbc/android/EditTextHandler.java
+ com.cbc.android.EditTextHandler
+com/cbc/entermeasure/AccessServer.java
+ com.cbc.entermeasure.AccessServer
+ com.cbc.entermeasure.AccessServer$1
+ com.cbc.entermeasure.AccessServer$Listeners
 com/cbc/entermeasure/MainActivity.java
  com.cbc.entermeasure.MainActivity
  com.cbc.entermeasure.MainActivity$1

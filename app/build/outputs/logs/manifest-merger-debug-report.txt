@@ -1,10 +1,10 @@
 -- Merging decision tree log ---
 manifest
-ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:2:1-43:12
-INJECTED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:2:1-43:12
-INJECTED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:2:1-43:12
-INJECTED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:2:1-43:12
-MERGED from [com.android.volley:volley:1.1.1] C:\Users\chris\.gradle\caches\transforms-2\files-2.1\8791c781ef62abac7b59ad07164cf6df\volley-1.1.1\AndroidManifest.xml:2:1-11:12
+ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:2:1-43:12
+INJECTED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:2:1-43:12
+INJECTED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:2:1-43:12
+INJECTED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:2:1-43:12
+MERGED from [com.android.volley:volley:1.2.1] C:\Users\chris\.gradle\caches\transforms-2\files-2.1\af411241ae0ee91a9b1d265f64342e1d\volley-1.2.1\AndroidManifest.xml:2:1-7:12
 MERGED from [com.google.android.material:material:1.1.0] C:\Users\chris\.gradle\caches\transforms-2\files-2.1\c9350c4470b6f4895016aaf418fed985\material-1.1.0\AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.appcompat:appcompat:1.2.0] C:\Users\chris\.gradle\caches\transforms-2\files-2.1\4f9c7f78c15bb692cf0895b881aafbad\appcompat-1.2.0\AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.constraintlayout:constraintlayout:1.1.3] C:\Users\chris\.gradle\caches\transforms-2\files-2.1\213ad6fce5ea38e5799c707ff664b050\constraintlayout-1.1.3\AndroidManifest.xml:2:1-11:12
@@ -32,43 +32,41 @@ MERGED from [androidx.interpolator:interpolator:1.0.0] C:\Users\chris\.gradle\ca
 MERGED from [androidx.lifecycle:lifecycle-livedata:2.0.0] C:\Users\chris\.gradle\caches\transforms-2\files-2.1\aaff256ac919a45448a380ca9a0003ca\lifecycle-livedata-2.0.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.0.0] C:\Users\chris\.gradle\caches\transforms-2\files-2.1\06bc4641de51b04d4df94808d6e05292\lifecycle-livedata-core-2.0.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.arch.core:core-runtime:2.0.0] C:\Users\chris\.gradle\caches\transforms-2\files-2.1\1b64911e987df0fea019408e241659d7\core-runtime-2.0.0\AndroidManifest.xml:17:1-22:12
-INJECTED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:2:1-43:12
-INJECTED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:2:1-43:12
-INJECTED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:2:1-43:12
+INJECTED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:2:1-43:12
+INJECTED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:2:1-43:12
+INJECTED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:2:1-43:12
 	package
-		ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:3:5-35
-		INJECTED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml
-		INJECTED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml
+		ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:3:5-35
+		INJECTED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml
+		INJECTED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml
 	android:versionName
-		INJECTED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml
-		ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:2:1-43:12
-		INJECTED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml
+		INJECTED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml
+		ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:2:1-43:12
+		INJECTED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml
 	android:versionCode
-		INJECTED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml
-		ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:2:1-43:12
-		INJECTED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml
+		INJECTED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml
+		ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:2:1-43:12
+		INJECTED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml
 	xmlns:android
-		ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:2:11-69
+		ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:2:11-69
 uses-permission#android.permission.WAKE_LOCK
-ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:5:5-68
+ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:5:5-68
 	android:name
-		ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:5:22-65
+		ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:5:22-65
 uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
-ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:6:5-81
+ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:6:5-81
 	android:name
-		ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:6:22-78
+		ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:6:22-78
 uses-permission#android.permission.READ_EXTERNAL_STORAGE
-ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:7:5-80
+ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:7:5-80
 	android:name
-		ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:7:22-77
+		ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:7:22-77
 uses-permission#android.permission.INTERNET
-ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:8:5-67
+ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:8:5-67
 	android:name
-		ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:8:22-64
+		ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:8:22-64
 application
-ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:10:5-41:19
-MERGED from [com.android.volley:volley:1.1.1] C:\Users\chris\.gradle\caches\transforms-2\files-2.1\8791c781ef62abac7b59ad07164cf6df\volley-1.1.1\AndroidManifest.xml:9:5-20
-MERGED from [com.android.volley:volley:1.1.1] C:\Users\chris\.gradle\caches\transforms-2\files-2.1\8791c781ef62abac7b59ad07164cf6df\volley-1.1.1\AndroidManifest.xml:9:5-20
+ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:10:5-41:19
 MERGED from [com.google.android.material:material:1.1.0] C:\Users\chris\.gradle\caches\transforms-2\files-2.1\c9350c4470b6f4895016aaf418fed985\material-1.1.0\AndroidManifest.xml:22:5-20
 MERGED from [com.google.android.material:material:1.1.0] C:\Users\chris\.gradle\caches\transforms-2\files-2.1\c9350c4470b6f4895016aaf418fed985\material-1.1.0\AndroidManifest.xml:22:5-20
 MERGED from [androidx.constraintlayout:constraintlayout:1.1.3] C:\Users\chris\.gradle\caches\transforms-2\files-2.1\213ad6fce5ea38e5799c707ff664b050\constraintlayout-1.1.3\AndroidManifest.xml:9:5-20
@@ -80,61 +78,61 @@ MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.0] C:\Users\ch
 	android:appComponentFactory
 		ADDED from [androidx.core:core:1.3.0] C:\Users\chris\.gradle\caches\transforms-2\files-2.1\817a61a686dfd849f92445d1d98580bd\core-1.3.0\AndroidManifest.xml:24:18-86
 	android:supportsRtl
-		ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:16:9-35
+		ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:16:9-35
 	android:label
-		ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:14:9-41
+		ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:14:9-41
 	android:roundIcon
-		ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:15:9-47
+		ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:15:9-47
 	android:icon
-		ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:13:9-42
+		ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:13:9-42
 	android:allowBackup
-		ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:12:9-35
+		ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:12:9-35
 	android:theme
-		ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:17:9-67
+		ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:17:9-67
 	android:usesCleartextTraffic
-		ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:11:9-44
+		ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:11:9-44
 activity#com.cbc.entermeasure.MainActivity
-ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:18:9-24:20
+ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:18:9-24:20
 	android:name
-		ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:18:19-47
+		ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:18:19-47
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:19:13-23:29
+ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:19:13-23:29
 action#android.intent.action.MAIN
-ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:20:17-69
+ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:20:17-69
 	android:name
-		ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:20:25-66
+		ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:20:25-66
 category#android.intent.category.LAUNCHER
-ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:22:17-77
+ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:22:17-77
 	android:name
-		ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:22:27-74
+		ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:22:27-74
 activity#com.cbc.entermeasure.AccessServer
-ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:25:9-32:20
+ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:25:9-32:20
 	android:parentActivityName
-		ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:28:13-55
+		ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:28:13-55
 	android:label
-		ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:27:13-42
+		ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:27:13-42
 	android:name
-		ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:26:13-41
+		ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:26:13-41
 meta-data#android.support.PARENT_ACTIVITY
-ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:29:13-31:49
+ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:29:13-31:49
 	android:value
-		ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:31:17-46
+		ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:31:17-46
 	android:name
-		ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:30:17-63
+		ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:30:17-63
 activity#com.cbc.entermeasure.FileHandler
-ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:33:9-40:20
+ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:33:9-40:20
 	android:parentActivityName
-		ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:36:13-55
+		ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:36:13-55
 	android:label
-		ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:35:13-48
+		ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:35:13-48
 	android:name
-		ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml:34:13-40
+		ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml:34:13-40
 uses-sdk
-INJECTED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
-INJECTED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml
-INJECTED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml
-MERGED from [com.android.volley:volley:1.1.1] C:\Users\chris\.gradle\caches\transforms-2\files-2.1\8791c781ef62abac7b59ad07164cf6df\volley-1.1.1\AndroidManifest.xml:7:5-43
-MERGED from [com.android.volley:volley:1.1.1] C:\Users\chris\.gradle\caches\transforms-2\files-2.1\8791c781ef62abac7b59ad07164cf6df\volley-1.1.1\AndroidManifest.xml:7:5-43
+INJECTED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml
+INJECTED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml
+MERGED from [com.android.volley:volley:1.2.1] C:\Users\chris\.gradle\caches\transforms-2\files-2.1\af411241ae0ee91a9b1d265f64342e1d\volley-1.2.1\AndroidManifest.xml:5:5-43
+MERGED from [com.android.volley:volley:1.2.1] C:\Users\chris\.gradle\caches\transforms-2\files-2.1\af411241ae0ee91a9b1d265f64342e1d\volley-1.2.1\AndroidManifest.xml:5:5-43
 MERGED from [com.google.android.material:material:1.1.0] C:\Users\chris\.gradle\caches\transforms-2\files-2.1\c9350c4470b6f4895016aaf418fed985\material-1.1.0\AndroidManifest.xml:20:5-44
 MERGED from [com.google.android.material:material:1.1.0] C:\Users\chris\.gradle\caches\transforms-2\files-2.1\c9350c4470b6f4895016aaf418fed985\material-1.1.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.appcompat:appcompat:1.2.0] C:\Users\chris\.gradle\caches\transforms-2\files-2.1\4f9c7f78c15bb692cf0895b881aafbad\appcompat-1.2.0\AndroidManifest.xml:20:5-22:41
@@ -189,13 +187,13 @@ MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.0.0] C:\Users\chris\.g
 MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.0.0] C:\Users\chris\.gradle\caches\transforms-2\files-2.1\06bc4641de51b04d4df94808d6e05292\lifecycle-livedata-core-2.0.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.arch.core:core-runtime:2.0.0] C:\Users\chris\.gradle\caches\transforms-2\files-2.1\1b64911e987df0fea019408e241659d7\core-runtime-2.0.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.arch.core:core-runtime:2.0.0] C:\Users\chris\.gradle\caches\transforms-2\files-2.1\1b64911e987df0fea019408e241659d7\core-runtime-2.0.0\AndroidManifest.xml:20:5-44
-INJECTED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml
-INJECTED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml
+INJECTED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml
+INJECTED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml
 	android:targetSdkVersion
-		INJECTED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml
-		ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml
-		INJECTED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml
+		INJECTED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml
+		ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml
+		INJECTED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml
 	android:minSdkVersion
-		INJECTED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml
-		ADDED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml
-		INJECTED from C:\MyFiles\Android\EnterMeasure\app\src\main\AndroidManifest.xml
+		INJECTED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml
+		ADDED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml
+		INJECTED from C:\MyFiles\EnterMeasure\app\src\main\AndroidManifest.xml
