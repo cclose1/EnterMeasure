@@ -89,6 +89,7 @@ public class AccessServer extends AppCompatActivity {
         } catch (Exception e) {
             Log.e("", "On click on id " + view.getId() + " failed with " + e.getMessage(), e);
         }
+
     }
     private void onComplete(View view) {
         finish();
